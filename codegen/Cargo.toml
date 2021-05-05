@@ -1,0 +1,11 @@
+[package]
+name = "synthez-codegen"
+version = "0.1.0"
+edition = "2018"
+resolver = "2"
+authors = ["Kai Ren <tyranron@gmail.com>"]
+
+[lib]
+proc-macro = true
+
+[dependencies]

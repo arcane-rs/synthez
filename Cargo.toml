@@ -1,0 +1,11 @@
+[package]
+name = "synthez"
+version = "0.1.0-dev"
+edition = "2018"
+resolver = "2"
+authors = ["Kai Ren <tyranron@gmail.com>"]
+
+[dependencies]
+
+[workspace]
+members = ["codegen"]
