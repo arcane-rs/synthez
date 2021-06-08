@@ -1,0 +1,28 @@
+[package]
+name = "synthez-core"
+version = "0.1.0-dev"
+edition = "2018"
+resolver = "2"
+description = "Internal implementations of synthez crate"
+authors = ["Kai Ren <tyranron@gmail.com>"]
+license = "BlueOak-1.0.0"
+documentation = "https://docs.rs/synthez-core"
+homepage = "https://github.com/arcana-rs/synthez/tree/master/core"
+repository = "https://github.com/arcana-rs/synthez/tree/master/core"
+readme = "README.md"
+categories = ["development-tools::procedural-macro-helpers"]
+
+[features]
+# Same as `full` feature of `syn` crate.
+# Enables support of data structures for representing the syntax tree of all
+# valid Rust source code, including items and expressions.
+full = ["syn/full"]
+
+[dependencies]
+proc-macro2 = { version = "1.0.4", default-features = false }
+quote = { version = "1.0.9", default-features = false }
+sealed = { version = "0.3", default-features = false }
+[dependencies.syn]
+    version = "1.0.72"
+    default-features = false
+    features = ["clone-impls", "derive", "extra-traits", "parsing", "printing"]

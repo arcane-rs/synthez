@@ -3,9 +3,31 @@ name = "synthez"
 version = "0.1.0-dev"
 edition = "2018"
 resolver = "2"
+description = "Steroids for syn, quote and proc_macro2 crates"
 authors = ["Kai Ren <tyranron@gmail.com>"]
+license = "BlueOak-1.0.0"
+documentation = "https://docs.rs/synthez"
+homepage = "https://github.com/arcana-rs/synthez"
+repository = "https://github.com/arcana-rs/synthez"
+readme = "README.md"
+keywords = ["codegen", "derive", "macro", "syn"]
+categories = [
+    "development-tools::build-utils",
+    "development-tools::procedural-macro-helpers",
+]
+
+[features]
+# Same as `full` feature of `syn` crate.
+# Enables support of data structures for representing the syntax tree of all
+# valid Rust source code, including items and expressions.
+full = ["synthez-core/full"]
 
 [dependencies]
+synthez-codegen = { version = "0.1.0-dev", path = "./codegen" }
+synthez-core = { version = "0.1.0-dev", path = "./core" }
+
+[dev-dependencies]
+syn = "1.0"
 
 [workspace]
-members = ["codegen"]
+members = ["codegen", "core"]

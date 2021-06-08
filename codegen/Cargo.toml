@@ -1,11 +1,27 @@
 [package]
 name = "synthez-codegen"
-version = "0.1.0"
+version = "0.1.0-dev"
 edition = "2018"
 resolver = "2"
+description = "Internal codegen shim of synthez crate"
 authors = ["Kai Ren <tyranron@gmail.com>"]
+license = "BlueOak-1.0.0"
+documentation = "https://docs.rs/synthez-codegen"
+homepage = "https://github.com/arcana-rs/synthez/tree/master/codegen"
+repository = "https://github.com/arcana-rs/synthez/tree/master/codegen"
+readme = "README.md"
+categories = ["development-tools::build-utils"]
 
 [lib]
 proc-macro = true
 
 [dependencies]
+synthez-core = { version = "0.1.0-dev", path = "../core" }
+[dependencies.proc-macro2]
+    version = "1.0.4"
+    default-features = false
+    features = ["proc-macro"]
+[dependencies.syn]
+    version = "1.0.72"
+    default-features = false
+    features = ["parsing", "proc-macro"]
