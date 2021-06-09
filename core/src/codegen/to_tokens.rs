@@ -9,7 +9,8 @@ use syn::{
 use crate::{
     parse::{
         attrs::{dedup, field::TryMerge as _, kind},
-        err, ParseBufferExt as _,
+        err,
+        ext::ParseBuffer as _,
     },
     ParseAttrs,
 };

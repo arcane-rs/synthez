@@ -2,43 +2,8 @@ use proc_macro2::Span;
 use sealed::sealed;
 use syn::{punctuated::Punctuated, spanned::Spanned as _, token};
 
-/// Extension of an [`Option`] providing common function widely used by this
-/// crate.
 #[sealed]
-pub trait OptionExt {
-    /// Type of the value wrapped into this [`Option`].
-    type Inner;
-
-    /// Transforms the `Option<T>` into a `Result<(), E>`, mapping `None` to
-    /// `Ok(())` and `Some(v)` to `Err(err(v))`.
-    ///
-    /// # Errors
-    ///
-    /// If `self` is [`None`].
-    fn none_or_else<E>(
-        self,
-        err: impl FnOnce(Self::Inner) -> E,
-    ) -> Result<(), E>;
-}
-
-#[sealed]
-impl<T> OptionExt for Option<T> {
-    type Inner = T;
-
-    #[inline]
-    fn none_or_else<E>(
-        self,
-        err: impl FnOnce(Self::Inner) -> E,
-    ) -> Result<(), E> {
-        match self {
-            Some(v) => Err(err(v)),
-            None => Ok(()),
-        }
-    }
-}
-
-#[sealed]
-pub trait DataExt {
+pub trait Data {
     fn named_fields(self) -> syn::Result<Punctuated<syn::Field, token::Comma>>;
 
     fn named_fields_ref(
@@ -47,7 +12,7 @@ pub trait DataExt {
 }
 
 #[sealed]
-impl DataExt for syn::Data {
+impl Data for syn::Data {
     fn named_fields(self) -> syn::Result<Punctuated<syn::Field, token::Comma>> {
         match self {
             syn::Data::Struct(data) => match data.fields {
@@ -92,13 +57,13 @@ impl DataExt for syn::Data {
 }
 
 #[sealed]
-pub trait IdentExt {
+pub trait Ident {
     #[must_use]
     fn new_on_call_site(ident: &str) -> syn::Ident;
 }
 
 #[sealed]
-impl IdentExt for syn::Ident {
+impl Ident for syn::Ident {
     #[inline]
     fn new_on_call_site(string: &str) -> Self {
         Self::new(string, Span::call_site())

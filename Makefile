@@ -18,6 +18,9 @@ eq = $(if $(or $(1),$(2)),$(and $(findstring $(1),$(2)),\
 fmt: cargo.fmt
 
 
+lint: cargo.lint
+
+
 
 
 ##################
@@ -33,11 +36,20 @@ cargo.fmt:
 	cargo +nightly fmt --all $(if $(call eq,$(check),yes),-- --check,)
 
 
+# Lint Rust sources with Clippy.
+#
+# Usage:
+#	make cargo.lint
+
+cargo.lint:
+	cargo clippy --workspace -- -D clippy::pedantic -D warnings
+
+
 
 
 ##################
 # .PHONY section #
 ##################
 
-.PHONY: fmt \
-        cargo.fmt
+.PHONY: fmt lint \
+        cargo.fmt cargo.lint

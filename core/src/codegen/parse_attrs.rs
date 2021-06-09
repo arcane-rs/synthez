@@ -13,7 +13,7 @@ use syn::{
 };
 
 use crate::{
-    ext::{DataExt as _, IdentExt as _},
+    ext::{Data as _, Ident as _},
     parse::{
         attrs::{
             dedup,
@@ -21,7 +21,8 @@ use crate::{
             kind,
             validate::{rule, IsValid as _},
         },
-        err, ParseBufferExt as _,
+        err,
+        ext::ParseBuffer as _,
     },
     ParseAttrs, Required, Spanning,
 };

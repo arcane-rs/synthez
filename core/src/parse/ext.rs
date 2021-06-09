@@ -2,15 +2,15 @@ use std::{any::TypeId, iter};
 
 use sealed::sealed;
 use syn::{
-    parse::{Parse, ParseBuffer},
+    parse::Parse,
     punctuated::Punctuated,
     token::{self, Token},
 };
 
-/// Extension of a [`syn::ParseBuffer`] providing common function widely used by
-/// this crate for parsing.
+/// Extension of a [`syn::parse::ParseBuffer`] providing common function widely
+/// used by this crate for parsing.
 #[sealed]
-pub trait ParseBufferExt {
+pub trait ParseBuffer {
     /// Tries to parse `T` as the next [`Token`].
     ///
     /// Doesn't move [`ParseStream`]'s cursor if there is no `T`.
@@ -79,7 +79,7 @@ pub trait ParseBufferExt {
 }
 
 #[sealed]
-impl<'buf> ParseBufferExt for ParseBuffer<'buf> {
+impl<'buf> ParseBuffer for syn::parse::ParseBuffer<'buf> {
     #[inline]
     fn try_parse<T: Default + Parse + Token>(&self) -> syn::Result<Option<T>> {
         self.is_next::<T>().then(|| self.parse()).transpose()
