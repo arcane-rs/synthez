@@ -1,8 +1,6 @@
-use std::{
-    collections::HashSet,
-    convert::TryFrom,
-    iter::{self, FromIterator as _},
-};
+//! `#[derive(ParseAttrs)]` proc macro implementation.
+
+use std::{collections::HashSet, convert::TryFrom, iter};
 
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens, TokenStreamExt as _};
@@ -33,11 +31,17 @@ const TRAIT_NAME: &str = "ParseAttrs";
 /// Name of the helper attribute of this `proc_macro_derive`.
 const ATTR_NAME: &str = "parse";
 
+/// Expands `#[derive(ParseAttrs)]` proc macro.
+///
+/// # Errors
+///
+/// - If the proc macro isn't applied to a struct.
+/// - If parsing `#[parse]` helper attribute fails.
 pub fn derive(input: syn::DeriveInput) -> syn::Result<TokenStream> {
     if !matches!(&input.data, syn::Data::Struct(_)) {
         return Err(syn::Error::new(
             input.span(),
-            format!("Only structs can derive {}", TRAIT_NAME),
+            format!("only structs can derive {}", TRAIT_NAME),
         ));
     }
 
@@ -60,14 +64,23 @@ pub fn derive(input: syn::DeriveInput) -> syn::Result<TokenStream> {
     })
 }
 
+/// Representation of a struct implementing [`ParseAttrs`], used for code
+/// generation.
 #[derive(Debug)]
 struct Definition {
+    /// [`syn::Ident`] of this structure's type.
     ty: syn::Ident,
+
+    /// [`syn::Generics`] of this structure's type.
     generics: syn::Generics,
+
+    /// [`Fields`] of this structure to generate code for.
     fields: Vec<Field>,
 }
 
 impl Definition {
+    /// Generates implementation of [`syn::parse::Parse`] trait for this struct.
+    #[must_use]
     fn impl_syn_parse(&self) -> TokenStream {
         let ty = &self.ty;
         let (impl_generics, ty_generics, where_clause) =
@@ -91,12 +104,15 @@ impl Definition {
                     >>::try_apply(&mut out.#field, input.parse::<#val_ty>()?)?;
                 },
                 Kind::Nested => quote! {
-                    ::synthez::parse::ParseBufferExt::skip_any_ident(input)?;
+                    ::synthez::ParseBufferExt::skip_any_ident(input)?;
                     let inner;
                     let _ = ::synthez::syn::parenthesized!(inner in input);
                     <#ty as ::synthez::parse::attrs::field::TryApply<
                         _, #kind, #dedup,
-                    >>::try_apply(&mut out.#field, inner.parse::<#val_ty>()?)?;
+                    >>::try_apply(
+                        &mut out.#field,
+                        ::synthez::Spanning::new(inner.parse()?, &ident),
+                    )?;
                 },
                 Kind::Value(spaced) => {
                     let method = syn::Ident::new_on_call_site(if spaced {
@@ -106,10 +122,8 @@ impl Definition {
                     });
 
                     quote! {
-                        ::synthez::parse::ParseBufferExt::skip_any_ident(
-                            input,
-                        )?;
-                        for v in ::synthez::parse::ParseBufferExt::#method::<
+                        ::synthez::ParseBufferExt::skip_any_ident(input)?;
+                        for v in ::synthez::ParseBufferExt::#method::<
                             #val_ty,
                             ::synthez::syn::token::Paren,
                             ::synthez::syn::token::Comma,
@@ -121,7 +135,7 @@ impl Definition {
                     }
                 }
                 Kind::Map => quote! {
-                    ::synthez::parse::ParseBufferExt::skip_any_ident(input)?;
+                    ::synthez::ParseBufferExt::skip_any_ident(input)?;
                     let k = input.parse()?;
                     input.parse::<::synthez::syn::token::Eq>()?;
                     let v = input.parse()?;
@@ -147,7 +161,7 @@ impl Definition {
                     let mut out = <#ty#ty_generics as Default>::default();
                     while !input.is_empty() {
                         let ident =
-                            ::synthez::parse::ParseBufferExt::parse_any_ident(
+                            ::synthez::ParseBufferExt::parse_any_ident(
                                 &input.fork(),
                             )?;
                         match ident.to_string().as_str() {
@@ -157,7 +171,7 @@ impl Definition {
                                     unknown_attr_arg(&ident, name));
                             },
                         }
-                        if ::synthez::parse::ParseBufferExt::try_parse::<
+                        if ::synthez::ParseBufferExt::try_parse::<
                             ::synthez::syn::token::Comma,
                         >(input)?.is_none() && !input.is_empty() {
                             return Err(::synthez::parse::err::
@@ -170,6 +184,8 @@ impl Definition {
         }
     }
 
+    /// Generates implementation of [`ParseAttrs`] trait for this struct.
+    #[must_use]
     fn impl_parse_attrs(&self) -> TokenStream {
         let ty = &self.ty;
         let (impl_generics, ty_generics, where_clause) =
@@ -202,7 +218,7 @@ impl Definition {
                 format!("`{}`", f.names.first().unwrap())
             };
             let err_msg = format!(
-                "{} argument of `#[{{}}]` attribute is expected",
+                "{} argument of `#[{{}}]` attribute is expected, but is absent",
                 arg_names,
             );
 
@@ -218,23 +234,19 @@ impl Definition {
             }
         });
 
-        let validate_custom_fields = self
-            .fields
-            .iter()
-            .map(|f| {
-                let field = &f.ident;
-                f.validators.iter().map(move |validator| {
-                    quote! {
-                        #validator(&self.#field)?;
-                    }
-                })
+        let validate_custom_fields = self.fields.iter().flat_map(|f| {
+            let field = &f.ident;
+            f.validators.iter().map(move |validator| {
+                quote! {
+                    #validator(&self.#field)?;
+                }
             })
-            .flatten();
+        });
 
         let fallback_fields = self
             .fields
             .iter()
-            .map(|f| {
+            .flat_map(|f| {
                 let field = &f.ident;
                 f.fallbacks.iter().map(move |fallback| {
                     quote! {
@@ -242,7 +254,6 @@ impl Definition {
                     }
                 })
             })
-            .flatten()
             .collect::<Vec<_>>();
         let fallback_method = (!fallback_fields.is_empty()).then(|| {
             quote! {
@@ -285,14 +296,34 @@ impl Definition {
     }
 }
 
+/// Representation of a [`ParseAttrs`]'s field, used for code generation.
 #[derive(Debug)]
 struct Field {
+    /// [`syn::Ident`] of this [`Field`] in the original code.
     ident: syn::Ident,
+
+    /// [`syn::Type`] of this [`Field`] (with [`field::Container`]).
+    ///
+    /// [`field::Container`]: crate::field::Container
     ty: syn::Type,
+
+    /// Parsing [`kind`] to use for this [`Field`] in the generated code.
     kind: Kind,
+
+    /// [`dedup`]lication strategy to use for this [`Field`] in the generated
+    /// code.
     dedup: Dedup,
+
+    /// Names [`syn::Attribute`]'s arguments to parse this [`Field`] from in the
+    /// generated code.
     names: Vec<String>,
+
+    /// Additional custom validators to apply to this [`Field`] in the generated
+    /// code.
     validators: Vec<syn::Expr>,
+
+    /// Additional custom fallback functions to apply to this [`Field`] in the
+    /// generated code.
     fallbacks: Vec<syn::Expr>,
 }
 
@@ -304,7 +335,7 @@ impl TryFrom<syn::Field> for Field {
         let ident = field.ident.unwrap();
 
         let mut names = if attrs.args.is_empty() {
-            HashSet::from_iter(iter::once(ident.clone()))
+            iter::once(ident.clone()).collect()
         } else {
             attrs.args
         };
@@ -322,23 +353,37 @@ impl TryFrom<syn::Field> for Field {
     }
 }
 
+/// Representation of a `#[parse]` attribute used along with a
+/// `#[derive(ParseAttrs)]` proc macro and placed on struct fields.
 #[derive(Debug, Default)]
 struct FieldAttrs {
-    // #[parse(ident, args(ident, value, map))]
+    /// [`kind`] of the [`ParseAttrs`]'s field parsing.
+    // #[parse(ident, args(ident, nested, value, map))]
     kind: Required<Spanning<Kind>>,
 
+    /// Names of [`syn::Attribute`]'s arguments to use for parsing __instead
+    /// of__ the [`ParseAttrs`]'s field's [`syn::Ident`].
     // #[parse(value, alias = arg)]
     args: HashSet<syn::Ident>,
 
+    /// Names of [`syn::Attribute`]'s arguments to use for parsing __along
+    /// with__ the [`ParseAttrs`]'s field's [`syn::Ident`].
     // #[parse(value, alias = alias)]
     aliases: HashSet<syn::Ident>,
 
+    /// [`dedup`]lication strategy of how multiple values of the
+    /// [`ParseAttrs`]'s field should be merged.
+    ///
+    /// Default is [`Dedup::Unique`].
     // #[parse(value)]
     dedup: Option<Spanning<Dedup>>,
 
+    /// Additional custom validators to use for the [`ParseAttrs`]'s field.
     // #[parse(value, arg = validate)]
     validators: Vec<syn::Expr>,
 
+    /// Additional custom fallback functions to use for the [`ParseAttrs`]'s
+    /// field.
     // #[parse(value, alias = fallback)]
     fallbacks: Vec<syn::Expr>,
 }
@@ -441,11 +486,22 @@ impl ParseAttrs for FieldAttrs {
     }
 }
 
+/// Field [`kind`] of parsing it from [`syn::Attribute`]s.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Kind {
+    /// Field is parsed as a simple [`syn::Ident`].
     Ident,
+
+    /// Field is parsed as a nested structure implementing [`ParseAttrs`].
     Nested,
+
+    /// Field is parsed as values behind a [`syn::Ident`].
+    ///
+    /// Boolean refers to whether the value and the [`syn::Ident`] are separated
+    /// with spaces only.
     Value(bool),
+
+    /// Field is parsed as as key-value pairs behind a [`syn::Ident`].
     Map,
 }
 
@@ -500,10 +556,16 @@ impl ToTokens for Kind {
     }
 }
 
+/// Field [`dedup`]lication strategy parsed from [`syn::Attribute`]s.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Dedup {
+    /// Only a single value of the field is allowed to appear.
     Unique,
+
+    /// Only the first parsed value of the field is picked.
     First,
+
+    /// Only the last parsed value of the field is picked.
     Last,
 }
 

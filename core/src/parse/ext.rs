@@ -1,3 +1,5 @@
+//! Extensions for [`syn::parse`] types.
+
 use std::{any::TypeId, iter};
 
 use sealed::sealed;
@@ -14,6 +16,10 @@ pub trait ParseBuffer {
     /// Tries to parse `T` as the next [`Token`].
     ///
     /// Doesn't move [`ParseStream`]'s cursor if there is no `T`.
+    ///
+    /// # Errors
+    ///
+    /// If `T` fails to be parsed.
     fn try_parse<T: Default + Parse + Token>(&self) -> syn::Result<Option<T>>;
 
     /// Checks whether the next [`Token`] is `T`.
@@ -24,25 +30,37 @@ pub trait ParseBuffer {
 
     /// Parses the next [`Token`] as [`syn::Ident`] _allowing_ Rust keywords,
     /// while default [`Parse`] implementation for [`syn::Ident`] disallows
-    /// keywords.
+    /// them.
     ///
     /// Always moves [`ParseStream`]'s cursor.
+    ///
+    /// # Errors
+    ///
+    /// If [`syn::Ident`] fails to be parsed.
     fn parse_any_ident(&self) -> syn::Result<syn::Ident>;
 
     /// Parses the next [`Token`] as [`syn::Ident`] _allowing_ Rust keywords,
     /// while default [`Parse`] implementation for [`syn::Ident`] disallows
-    /// keywords, and drops it in-place.
+    /// them. Drops the parsed [`Token`] in-place.
     ///
     /// Always moves [`ParseStream`]'s cursor.
+    ///
+    /// # Errors
+    ///
+    /// If [`syn::Ident`] fails to be parsed.
     #[inline]
     fn skip_any_ident(&self) -> syn::Result<()> {
         self.parse_any_ident().map(drop)
     }
 
     /// Parses the wrapped (in a wrapper `W`) [`Token`]s as `T` [`Punctuated`]
-    /// with `P`.
+    /// with a `P` separator.
     ///
     /// Always moves [`ParseStream`]'s cursor.
+    ///
+    /// # Errors
+    ///
+    /// If parsing [`Punctuated`] `T` wrapped into `W` fails.
     fn parse_wrapped_and_punctuated<T, W, P>(
         &self,
     ) -> syn::Result<Punctuated<T, P>>
@@ -52,10 +70,15 @@ pub trait ParseBuffer {
         P: Default + Parse + Token;
 
     /// Checks whether the next [`Token`] is a wrapper `W` and if yes, then
-    /// parses the wrapped [`Token`]s as `T` [`Punctuated`] with `P`. Otherwise,
-    /// parses just `T`.
+    /// parses the wrapped [`Token`]s as `T` [`Punctuated`] with a `P`
+    /// separator. Otherwise, parses just `T`.
     ///
     /// Always moves [`ParseStream`]'s cursor.
+    ///
+    /// # Errors
+    ///
+    /// If either parsing [`Punctuated`] `T` wrapped into `W`, or parsing just
+    /// `T`, fails.
     fn parse_maybe_wrapped_and_punctuated<T, W, P>(
         &self,
     ) -> syn::Result<Punctuated<T, P>>
@@ -65,10 +88,15 @@ pub trait ParseBuffer {
         P: Default + Parse + Token;
 
     /// Checks whether the next [`Token`] is a wrapper `W` and if yes, then
-    /// parses the wrapped [`Token`]s as `T` [`Punctuated`] with `P`. Otherwise,
-    /// parses just `T` following the [`token::Eq`].
+    /// parses the wrapped [`Token`]s as `T` [`Punctuated`] with a `P`
+    /// separator. Otherwise, parses just `T` following the [`token::Eq`].
     ///
     /// Always moves [`ParseStream`]'s cursor.
+    ///
+    /// # Errors
+    ///
+    /// If either parsing [`Punctuated`] `T` wrapped into `W`, or parsing just
+    /// `T` following the [`token::Eq`], fails .
     fn parse_eq_or_wrapped_and_punctuated<T, W, P>(
         &self,
     ) -> syn::Result<Punctuated<T, P>>
@@ -145,7 +173,7 @@ impl<'buf> ParseBuffer for syn::parse::ParseBuffer<'buf> {
         Ok(if self.is_next::<W>() {
             self.parse_wrapped_and_punctuated::<T, W, P>()?
         } else {
-            self.parse::<token::Eq>()?;
+            let _ = self.parse::<token::Eq>()?;
             iter::once(self.parse::<T>()?).collect()
         })
     }

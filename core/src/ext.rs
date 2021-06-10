@@ -1,11 +1,30 @@
+//! Extensions for [`syn`] types.
+
 use proc_macro2::Span;
 use sealed::sealed;
 use syn::{punctuated::Punctuated, spanned::Spanned as _, token};
 
+/// Extension of a [`syn::Data`].
 #[sealed]
 pub trait Data {
+    /// Parses [`syn::Fields::Named`] from this consumed [`syn::Data::Struct`]
+    /// and returns owning iterator over them.
+    ///
+    /// # Errors
+    ///
+    /// - If this [`syn::Data`] is not a [`syn::Data::Struct`].
+    /// - If this [`syn::Data::Struct`] doesn't consist of
+    ///   [`syn::Fields::Named`].
     fn named_fields(self) -> syn::Result<Punctuated<syn::Field, token::Comma>>;
 
+    /// Parses [`syn::Fields::Named`] from this borrowed [`syn::Data::Struct`]
+    /// and returns referencing iterator over them.
+    ///
+    /// # Errors
+    ///
+    /// - If this [`syn::Data`] is not a [`syn::Data::Struct`].
+    /// - If this [`syn::Data::Struct`] doesn't consist of
+    ///   [`syn::Fields::Named`].
     fn named_fields_ref(
         &self,
     ) -> syn::Result<&Punctuated<syn::Field, token::Comma>>;
@@ -56,8 +75,11 @@ impl Data for syn::Data {
     }
 }
 
+/// Extension of a [`syn::Ident`].
 #[sealed]
 pub trait Ident {
+    /// Creates a new [`syn::Ident`] out of the given string value with a
+    /// [`Span::call_site`].
     #[must_use]
     fn new_on_call_site(ident: &str) -> syn::Ident;
 }

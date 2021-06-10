@@ -1,3 +1,5 @@
+//! Batteries for [`Span`] and [`syn::spanned`].
+
 use std::{
     cmp::{Eq, PartialEq},
     ops::{Deref, DerefMut},
@@ -10,41 +12,48 @@ use syn::spanned::Spanned;
 /// Helper coercion for [`Span`] and [`Spanned`] types to use in function
 /// arguments.
 #[sealed]
-pub trait AsSpan {
+pub trait IntoSpan {
     /// Returns the coerced [`Span`].
     #[must_use]
-    fn as_span(&self) -> Span;
+    fn into_span(self) -> Span;
 }
 
 #[sealed]
-impl AsSpan for Span {
+impl IntoSpan for Span {
     #[inline]
-    fn as_span(&self) -> Self {
-        *self
+    fn into_span(self) -> Self {
+        self
     }
 }
 
 #[sealed]
-impl<T: Spanned> AsSpan for &T {
+impl<T: Spanned> IntoSpan for &T {
     #[inline]
-    fn as_span(&self) -> Span {
+    fn into_span(self) -> Span {
         self.span()
     }
 }
 
+/// Wrapper for non-[`Spanned`] types to hold their [`Span`].
 #[derive(Clone, Copy, Debug)]
 pub struct Spanning<T: ?Sized> {
+    /// [`Span`] of the `item`.
     span: Span,
+
+    /// Item the [`Span`] is held for.
     item: T,
 }
 
 impl<T> Spanning<T> {
+    /// Creates a new [`Spanning`] `item` out of the given value and its
+    /// [`Span`].
     #[inline]
     #[must_use]
-    pub fn new<S: AsSpan>(item: T, span: S) -> Self {
-        Self { span: span.as_span(), item }
+    pub fn new<S: IntoSpan>(item: T, span: S) -> Self {
+        Self { span: span.into_span(), item }
     }
 
+    /// Destructures this [`Spanning`] wrapper returning the underlying value.
     #[inline]
     #[must_use]
     pub fn into_inner(self) -> T {
@@ -73,6 +82,7 @@ where
     T: PartialEq<V> + ?Sized,
     V: ?Sized,
 {
+    #[inline]
     fn eq(&self, other: &Spanning<V>) -> bool {
         self.item.eq(&other.item)
     }

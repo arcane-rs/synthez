@@ -1,3 +1,5 @@
+//! `#[derive(ToTokens)]` proc macro implementation.
+
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::{
@@ -21,15 +23,21 @@ const TRAIT_NAME: &str = "ToTokens";
 /// Name of the helper attribute of this `proc_macro_derive`.
 const ATTR_NAME: &str = "to_tokens";
 
-pub fn derive(input: syn::DeriveInput) -> syn::Result<TokenStream> {
+/// Expands `#[derive(ToTokens)]` proc macro.
+///
+/// # Errors
+///
+/// - If the proc macro isn't applied to a struct or an enum.
+/// - If parsing `#[to_tokens]` helper attribute fails.
+pub fn derive(input: &syn::DeriveInput) -> syn::Result<TokenStream> {
     if !matches!(&input.data, syn::Data::Enum(_) | syn::Data::Struct(_)) {
         return Err(syn::Error::new(
             input.span(),
-            format!("Only structs and enums can derive {}", TRAIT_NAME),
+            format!("only structs and enums can derive {}", TRAIT_NAME),
         ));
     }
 
-    let attrs = Attrs::parse_attrs(ATTR_NAME, &input)?;
+    let attrs = Attrs::parse_attrs(ATTR_NAME, input)?;
 
     let ty = &input.ident;
     let (impl_generics, ty_generics, where_clause) =
@@ -56,8 +64,13 @@ pub fn derive(input: syn::DeriveInput) -> syn::Result<TokenStream> {
     })
 }
 
+/// Representation of a `#[to_tokens]` attribute used along with a
+/// `#[derive(ToTokens)]` proc macro on a top-level definition.
 #[derive(Debug, Default)]
 struct Attrs {
+    /// Methods to be called in the generated [`ToTokens`] implementation.
+    ///
+    /// [`ToTokens`]: quote::ToTokens
     // #[parse(value)]
     append: Vec<syn::Ident>,
 }

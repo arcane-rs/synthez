@@ -1,4 +1,8 @@
+//! Abstraction over [`syn`] types containing something.
+
+/// [`syn`] types containing [`syn::Attribute`]s.
 pub trait Attrs {
+    /// Returns contained [`syn::Attribute`]s.
     #[must_use]
     fn attrs(&self) -> &[syn::Attribute];
 }
@@ -33,7 +37,20 @@ impl_attrs_for! {
 }
 
 #[cfg(feature = "full")]
-impl_attrs_for! {
+macro_rules! impl_attrs_full_for {
+    ($( $ty:ty, )+) => {$(
+        #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+        impl Attrs for $ty {
+            #[inline]
+            fn attrs(&self) -> &[syn::Attribute] {
+                &*self.attrs
+            }
+        }
+    )+}
+}
+
+#[cfg(feature = "full")]
+impl_attrs_full_for! {
     syn::Arm,
     syn::ExprArray,
     syn::ExprAssign,

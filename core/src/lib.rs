@@ -1,3 +1,7 @@
+//! Internal implementations of [`synthez`] crate. Refer to its documentation
+//! for details.
+
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![deny(
     nonstandard_style,
     rust_2018_idioms,
@@ -26,7 +30,6 @@ pub mod field;
 pub mod has;
 pub mod parse;
 pub mod spanned;
-pub mod types;
 
 pub use proc_macro2;
 pub use quote::{self, ToTokens};
@@ -35,7 +38,7 @@ pub use syn;
 #[doc(inline)]
 pub use self::{
     ext::{Data as DataExt, Ident as IdentExt},
+    field::Required,
     parse::{Attrs as ParseAttrs, BufferExt as ParseBufferExt},
     spanned::Spanning,
-    types::Required,
 };

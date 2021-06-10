@@ -1,3 +1,7 @@
+//! Steroids for [`syn`], [`quote`] and [`proc_macro2`] crates.
+//!
+//! TODO: overview and examples
+
 #![deny(
     nonstandard_style,
     rust_2018_idioms,

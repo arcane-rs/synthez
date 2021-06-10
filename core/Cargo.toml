@@ -26,3 +26,10 @@ sealed = { version = "0.3", default-features = false }
     version = "1.0.72"
     default-features = false
     features = ["clone-impls", "derive", "extra-traits", "parsing", "printing"]
+
+[dev-dependencies]
+synthez = { version = "0.1.0-dev", path = ".." }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

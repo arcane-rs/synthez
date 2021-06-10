@@ -1,32 +1,22 @@
 //! Common errors of parsing.
 
-use crate::spanned::AsSpan;
+use crate::spanned::IntoSpan;
 
 /// Creates a "duplicated attribute's argument" [`syn::Error`] pointing to the
-/// given `span`.
+/// given [`Span`].
 #[inline]
 #[must_use]
-pub fn dup_attr_arg<S: AsSpan>(span: S) -> syn::Error {
-    syn::Error::new(span.as_span(), "duplicated attribute's argument found")
+pub fn dup_attr_arg<S: IntoSpan>(span: S) -> syn::Error {
+    syn::Error::new(span.into_span(), "duplicated attribute's argument found")
 }
 
 /// Creates an "unknown attribute's argument" [`syn::Error`] for the given
-/// `name` pointing to the given `span`.
+/// `name` pointing to the given [`Span`].
 #[must_use]
-pub fn unknown_attr_arg<S: AsSpan>(span: S, name: &str) -> syn::Error {
+pub fn unknown_attr_arg<S: IntoSpan>(span: S, name: &str) -> syn::Error {
     syn::Error::new(
-        span.as_span(),
+        span.into_span(),
         format!("unknown `{}` attribute argument", name),
-    )
-}
-
-/// Creates a "required attribute's argument" [`syn::Error`] for the given
-/// `name` in the given [`Span`].
-#[must_use]
-pub fn required_attr_arg<S: AsSpan>(span: S, name: &str) -> syn::Error {
-    syn::Error::new(
-        span.as_span(),
-        format!("`{}` attribute argument is required, but is absent", name),
     )
 }
 
@@ -34,6 +24,6 @@ pub fn required_attr_arg<S: AsSpan>(span: S, name: &str) -> syn::Error {
 /// [`Span`].
 #[inline]
 #[must_use]
-pub fn expected_followed_by_comma<S: AsSpan>(span: S) -> syn::Error {
-    syn::Error::new(span.as_span(), "expected followed by `,`")
+pub fn expected_followed_by_comma<S: IntoSpan>(span: S) -> syn::Error {
+    syn::Error::new(span.into_span(), "expected followed by `,`")
 }
