@@ -4,6 +4,8 @@ use crate::spanned::IntoSpan;
 
 /// Creates a "duplicated attribute's argument" [`syn::Error`] pointing to the
 /// given [`Span`].
+///
+/// [`Span`]: proc_macro2::Span
 #[inline]
 #[must_use]
 pub fn dup_attr_arg<S: IntoSpan>(span: S) -> syn::Error {
@@ -12,6 +14,8 @@ pub fn dup_attr_arg<S: IntoSpan>(span: S) -> syn::Error {
 
 /// Creates an "unknown attribute's argument" [`syn::Error`] for the given
 /// `name` pointing to the given [`Span`].
+///
+/// [`Span`]: proc_macro2::Span
 #[must_use]
 pub fn unknown_attr_arg<S: IntoSpan>(span: S, name: &str) -> syn::Error {
     syn::Error::new(
@@ -22,6 +26,8 @@ pub fn unknown_attr_arg<S: IntoSpan>(span: S, name: &str) -> syn::Error {
 
 /// Creates an "expected followed by comma" [`syn::Error`] in the given
 /// [`Span`].
+///
+/// [`Span`]: proc_macro2::Span
 #[inline]
 #[must_use]
 pub fn expected_followed_by_comma<S: IntoSpan>(span: S) -> syn::Error {

@@ -1,5 +1,7 @@
 //! Internal implementations of [`synthez`] crate. Refer to its documentation
 //! for details.
+//!
+//! [`synthez`]: https://docs.rs/synthez
 
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![deny(

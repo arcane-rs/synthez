@@ -6,7 +6,6 @@ use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens, TokenStreamExt as _};
 use syn::{
     parse::{Parse, ParseStream},
-    spanned::Spanned as _,
     token,
 };
 
@@ -39,8 +38,8 @@ const ATTR_NAME: &str = "parse";
 /// - If parsing `#[parse]` helper attribute fails.
 pub fn derive(input: syn::DeriveInput) -> syn::Result<TokenStream> {
     if !matches!(&input.data, syn::Data::Struct(_)) {
-        return Err(syn::Error::new(
-            input.span(),
+        return Err(syn::Error::new_spanned(
+            input,
             format!("only structs can derive {}", TRAIT_NAME),
         ));
     }
@@ -519,8 +518,8 @@ impl Parse for Spanning<Kind> {
                         let inner = inner.parse::<syn::Ident>()?;
                         let val = inner.to_string();
                         if val != "spaced" {
-                            return Err(syn::Error::new(
-                                inner.span(),
+                            return Err(syn::Error::new_spanned(
+                                inner,
                                 format!("invalid value setting: {} ", val),
                             ));
                         }
@@ -531,8 +530,8 @@ impl Parse for Spanning<Kind> {
                 }
                 "map" => Kind::Map,
                 val => {
-                    return Err(syn::Error::new(
-                        ident.span(),
+                    return Err(syn::Error::new_spanned(
+                        ident,
                         format!("invalid kind value: {} ", val),
                     ))
                 }
@@ -585,8 +584,8 @@ impl Parse for Spanning<Dedup> {
                 "first" => Dedup::First,
                 "last" => Dedup::Last,
                 val => {
-                    return Err(syn::Error::new(
-                        ident.span(),
+                    return Err(syn::Error::new_spanned(
+                        ident,
                         format!("invalid dedup value: {} ", val),
                     ))
                 }

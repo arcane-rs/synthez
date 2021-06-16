@@ -787,6 +787,8 @@ pub mod kind {
     pub trait Kind {}
 
     /// [`Kind`]s allowing to parse only a single value of an [`Attrs`]' field.
+    ///
+    /// [`Attrs`]: super::Attrs
     #[sealed]
     pub trait Single {}
 
@@ -798,6 +800,7 @@ pub mod kind {
     /// ```
     ///
     /// [`Attrs`]: super::Attrs
+    /// [`syn::Ident`]: struct@syn::Ident
     #[derive(Clone, Copy, Debug)]
     pub enum Ident {}
 
@@ -833,6 +836,7 @@ pub mod kind {
     /// ```
     ///
     /// [`Attrs`]: super::Attrs
+    /// [`syn::Ident`]: struct@syn::Ident
     #[derive(Clone, Copy, Debug)]
     pub enum Value {}
 
@@ -850,6 +854,7 @@ pub mod kind {
     /// ```
     ///
     /// [`Attrs`]: super::Attrs
+    /// [`syn::Ident`]: struct@syn::Ident
     #[derive(Clone, Copy, Debug)]
     pub enum Map {}
 
@@ -923,6 +928,7 @@ pub mod validate {
     /// Validation of a [`Rule`] during an [`Attrs`]' field parsing into a
     /// [`field::Container`].
     ///
+    /// [`Attrs`]: super::Attrs
     /// [`field::Container`]: crate::field::Container
     pub trait Validate<R: Rule + ?Sized> {
         /// Checks whether the validation [`Rule`] is satisfied.

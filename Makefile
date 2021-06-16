@@ -15,6 +15,10 @@ eq = $(if $(or $(1),$(2)),$(and $(findstring $(1),$(2)),\
 # Aliases #
 ###########
 
+
+doc: cargo.doc
+
+
 fmt: cargo.fmt
 
 
@@ -26,6 +30,21 @@ lint: cargo.lint
 ##################
 # Cargo commands #
 ##################
+
+# Generate crates documentation from Rust sources.
+#
+# Usage:
+#	make cargo.doc [crate=<crate-name>] [open=(yes|no)] [clean=(no|yes)]
+#
+
+cargo.doc:
+ifeq ($(clean),yes)
+	@rm -rf target/doc/
+endif
+	cargo doc $(if $(call eq,$(crate),),--workspace,-p $(crate)) \
+		--all-features \
+		$(if $(call eq,$(open),no),,--open)
+
 
 # Format Rust sources with rustfmt.
 #
@@ -51,5 +70,5 @@ cargo.lint:
 # .PHONY section #
 ##################
 
-.PHONY: fmt lint \
-        cargo.fmt cargo.lint
+.PHONY: doc fmt lint \
+        cargo.doc cargo.fmt cargo.lint

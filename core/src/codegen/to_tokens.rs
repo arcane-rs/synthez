@@ -4,7 +4,6 @@ use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::{
     parse::{Parse, ParseStream},
-    spanned::Spanned as _,
     token,
 };
 
@@ -31,8 +30,8 @@ const ATTR_NAME: &str = "to_tokens";
 /// - If parsing `#[to_tokens]` helper attribute fails.
 pub fn derive(input: &syn::DeriveInput) -> syn::Result<TokenStream> {
     if !matches!(&input.data, syn::Data::Enum(_) | syn::Data::Struct(_)) {
-        return Err(syn::Error::new(
-            input.span(),
+        return Err(syn::Error::new_spanned(
+            input,
             format!("only structs and enums can derive {}", TRAIT_NAME),
         ));
     }

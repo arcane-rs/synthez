@@ -1,4 +1,4 @@
-//! Batteries for [`syn::parse`].
+//! Batteries for [`syn::parse`](mod@syn::parse).
 
 pub mod attr;
 pub mod attrs;

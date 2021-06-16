@@ -2,7 +2,7 @@
 
 use proc_macro2::Span;
 use sealed::sealed;
-use syn::{punctuated::Punctuated, spanned::Spanned as _, token};
+use syn::{punctuated::Punctuated, token};
 
 /// Extension of a [`syn::Data`].
 #[sealed]
@@ -28,6 +28,30 @@ pub trait Data {
     fn named_fields_ref(
         &self,
     ) -> syn::Result<&Punctuated<syn::Field, token::Comma>>;
+
+    /// Parses [`syn::Fields::Unnamed`] from this consumed [`syn::Data::Struct`]
+    /// and returns owning iterator over them.
+    ///
+    /// # Errors
+    ///
+    /// - If this [`syn::Data`] is not a [`syn::Data::Struct`].
+    /// - If this [`syn::Data::Struct`] doesn't consist of
+    ///   [`syn::Fields::Unnamed`].
+    fn unnamed_fields(
+        self,
+    ) -> syn::Result<Punctuated<syn::Field, token::Comma>>;
+
+    /// Parses [`syn::Fields::Unnamed`] from this borrowed [`syn::Data::Struct`]
+    /// and returns referencing iterator over them.
+    ///
+    /// # Errors
+    ///
+    /// - If this [`syn::Data`] is not a [`syn::Data::Struct`].
+    /// - If this [`syn::Data::Struct`] doesn't consist of
+    ///   [`syn::Fields::Unnamed`].
+    fn unnamed_fields_ref(
+        &self,
+    ) -> syn::Result<&Punctuated<syn::Field, token::Comma>>;
 }
 
 #[sealed]
@@ -36,17 +60,17 @@ impl Data for syn::Data {
         match self {
             syn::Data::Struct(data) => match data.fields {
                 syn::Fields::Named(f) => Ok(f.named),
-                fields => Err(syn::Error::new(
-                    fields.span(),
+                fields => Err(syn::Error::new_spanned(
+                    fields,
                     "expected named struct fields only",
                 )),
             },
-            syn::Data::Enum(data) => Err(syn::Error::new(
-                data.enum_token.span(),
+            syn::Data::Enum(data) => Err(syn::Error::new_spanned(
+                data.enum_token,
                 "expected struct only",
             )),
-            syn::Data::Union(data) => Err(syn::Error::new(
-                data.union_token.span(),
+            syn::Data::Union(data) => Err(syn::Error::new_spanned(
+                data.union_token,
                 "expected struct only",
             )),
         }
@@ -58,28 +82,74 @@ impl Data for syn::Data {
         match self {
             syn::Data::Struct(data) => match &data.fields {
                 syn::Fields::Named(f) => Ok(&f.named),
-                fields => Err(syn::Error::new(
-                    fields.span(),
+                fields => Err(syn::Error::new_spanned(
+                    fields,
                     "expected named struct fields only",
                 )),
             },
-            syn::Data::Enum(data) => Err(syn::Error::new(
-                data.enum_token.span(),
+            syn::Data::Enum(data) => Err(syn::Error::new_spanned(
+                data.enum_token,
                 "expected struct only",
             )),
-            syn::Data::Union(data) => Err(syn::Error::new(
-                data.union_token.span(),
+            syn::Data::Union(data) => Err(syn::Error::new_spanned(
+                data.union_token,
+                "expected struct only",
+            )),
+        }
+    }
+
+    fn unnamed_fields(
+        self,
+    ) -> syn::Result<Punctuated<syn::Field, token::Comma>> {
+        match self {
+            syn::Data::Struct(data) => match data.fields {
+                syn::Fields::Unnamed(f) => Ok(f.unnamed),
+                fields => Err(syn::Error::new_spanned(
+                    fields,
+                    "expected unnamed struct fields only",
+                )),
+            },
+            syn::Data::Enum(data) => Err(syn::Error::new_spanned(
+                data.enum_token,
+                "expected struct only",
+            )),
+            syn::Data::Union(data) => Err(syn::Error::new_spanned(
+                data.union_token,
+                "expected struct only",
+            )),
+        }
+    }
+
+    fn unnamed_fields_ref(
+        &self,
+    ) -> syn::Result<&Punctuated<syn::Field, token::Comma>> {
+        match self {
+            syn::Data::Struct(data) => match &data.fields {
+                syn::Fields::Unnamed(f) => Ok(&f.unnamed),
+                fields => Err(syn::Error::new_spanned(
+                    fields,
+                    "expected unnamed struct fields only",
+                )),
+            },
+            syn::Data::Enum(data) => Err(syn::Error::new_spanned(
+                data.enum_token,
+                "expected struct only",
+            )),
+            syn::Data::Union(data) => Err(syn::Error::new_spanned(
+                data.union_token,
                 "expected struct only",
             )),
         }
     }
 }
 
-/// Extension of a [`syn::Ident`].
+/// Extension of a [`syn::Ident`](struct@syn::Ident).
 #[sealed]
 pub trait Ident {
     /// Creates a new [`syn::Ident`] out of the given string value with a
     /// [`Span::call_site`].
+    ///
+    /// [`syn::Ident`]: struct@syn::Ident
     #[must_use]
     fn new_on_call_site(ident: &str) -> syn::Ident;
 }

@@ -31,3 +31,7 @@ syn = "1.0"
 
 [workspace]
 members = ["codegen", "core"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

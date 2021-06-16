@@ -13,7 +13,7 @@ jobs:
 
   clippy:
     if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/')
+            || startsWith(github.ref, 'refs/tags/synthez-')
             || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
@@ -31,7 +31,7 @@ jobs:
 
   rustfmt:
     if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/')
+            || startsWith(github.ref, 'refs/tags/synthez-')
             || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
@@ -43,3 +43,33 @@ jobs:
           components: rustfmt
 
       - run: make cargo.fmt check=yes
+
+
+
+
+  ############
+  # Building #
+  ############
+
+  rustdoc:
+    if: ${{ github.ref == 'refs/heads/master'
+            || startsWith(github.ref, 'refs/tags/synthez-')
+            || !contains(github.event.head_commit.message, '[skip ci]') }}
+    strategy:
+      matrix:
+        crate:
+          - synthez-core
+          - synthez-codegen
+          - synthez
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - uses: Swatinem/rust-cache@v1
+        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
+
+      - run: make cargo.doc crate=${{ matrix.crate }} open=no clean=yes

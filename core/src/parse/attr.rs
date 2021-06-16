@@ -33,8 +33,8 @@ pub fn doc_string(
                     out.push('\n');
                 }
             } else {
-                return Err(syn::Error::new(
-                    item.lit.span(),
+                return Err(syn::Error::new_spanned(
+                    item.lit,
                     "`#[doc]` attribute can contain string literals only",
                 ));
             }
@@ -55,6 +55,8 @@ pub fn doc_string(
 ///
 /// - If parsing text from `#[doc]` attribute fails.
 /// - If `#[doc]` doesn't contain text.
+///
+/// [`syn::LitStr`]: struct@syn::LitStr
 #[inline]
 pub fn doc(attrs: &[syn::Attribute]) -> syn::Result<Option<syn::LitStr>> {
     doc_string(attrs).map(|opt| opt.map(Into::into))

@@ -1,4 +1,6 @@
 //! Extensions for [`syn::parse`] types.
+//!
+//! [`syn::parse`]: mod@syn::parse
 
 use std::{any::TypeId, iter};
 
@@ -15,7 +17,7 @@ use syn::{
 pub trait ParseBuffer {
     /// Tries to parse `T` as the next [`Token`].
     ///
-    /// Doesn't move [`ParseStream`]'s cursor if there is no `T`.
+    /// Doesn't move [`ParseBuffer`]'s cursor if there is no `T`.
     ///
     /// # Errors
     ///
@@ -24,7 +26,7 @@ pub trait ParseBuffer {
 
     /// Checks whether the next [`Token`] is `T`.
     ///
-    /// Doesn't move [`ParseStream`]'s cursor.
+    /// Doesn't move [`ParseBuffer`]'s cursor.
     #[must_use]
     fn is_next<T: Default + Token>(&self) -> bool;
 
@@ -32,22 +34,26 @@ pub trait ParseBuffer {
     /// while default [`Parse`] implementation for [`syn::Ident`] disallows
     /// them.
     ///
-    /// Always moves [`ParseStream`]'s cursor.
+    /// Always moves [`ParseBuffer`]'s cursor.
     ///
     /// # Errors
     ///
     /// If [`syn::Ident`] fails to be parsed.
+    ///
+    /// [`syn::Ident`]: struct@syn::Ident
     fn parse_any_ident(&self) -> syn::Result<syn::Ident>;
 
     /// Parses the next [`Token`] as [`syn::Ident`] _allowing_ Rust keywords,
     /// while default [`Parse`] implementation for [`syn::Ident`] disallows
     /// them. Drops the parsed [`Token`] in-place.
     ///
-    /// Always moves [`ParseStream`]'s cursor.
+    /// Always moves [`ParseBuffer`]'s cursor.
     ///
     /// # Errors
     ///
     /// If [`syn::Ident`] fails to be parsed.
+    ///
+    /// [`syn::Ident`]: struct@syn::Ident
     #[inline]
     fn skip_any_ident(&self) -> syn::Result<()> {
         self.parse_any_ident().map(drop)
@@ -56,7 +62,7 @@ pub trait ParseBuffer {
     /// Parses the wrapped (in a wrapper `W`) [`Token`]s as `T` [`Punctuated`]
     /// with a `P` separator.
     ///
-    /// Always moves [`ParseStream`]'s cursor.
+    /// Always moves [`ParseBuffer`]'s cursor.
     ///
     /// # Errors
     ///
@@ -73,7 +79,7 @@ pub trait ParseBuffer {
     /// parses the wrapped [`Token`]s as `T` [`Punctuated`] with a `P`
     /// separator. Otherwise, parses just `T`.
     ///
-    /// Always moves [`ParseStream`]'s cursor.
+    /// Always moves [`ParseBuffer`]'s cursor.
     ///
     /// # Errors
     ///
@@ -91,12 +97,14 @@ pub trait ParseBuffer {
     /// parses the wrapped [`Token`]s as `T` [`Punctuated`] with a `P`
     /// separator. Otherwise, parses just `T` following the [`token::Eq`].
     ///
-    /// Always moves [`ParseStream`]'s cursor.
+    /// Always moves [`ParseBuffer`]'s cursor.
     ///
     /// # Errors
     ///
     /// If either parsing [`Punctuated`] `T` wrapped into `W`, or parsing just
-    /// `T` following the [`token::Eq`], fails .
+    /// `T` following the [`token::Eq`], fails.
+    ///
+    /// [`token::Eq`]: struct@token::Eq
     fn parse_eq_or_wrapped_and_punctuated<T, W, P>(
         &self,
     ) -> syn::Result<Punctuated<T, P>>
