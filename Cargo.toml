@@ -1,6 +1,6 @@
 [package]
 name = "synthez"
-version = "0.1.0-dev"
+version = "0.1.0"
 edition = "2018"
 resolver = "2"
 description = "Steroids for syn, quote and proc_macro2 crates"
@@ -15,6 +15,7 @@ categories = [
     "development-tools::build-utils",
     "development-tools::procedural-macro-helpers",
 ]
+include = ["/src/", "/Cargo.toml", "/CHANGELOG.md", "/LICENSE.md", "/README.md"]
 
 [features]
 # Same as `full` feature of `syn` crate.
@@ -23,8 +24,8 @@ categories = [
 full = ["synthez-core/full"]
 
 [dependencies]
-synthez-codegen = { version = "0.1.0-dev", path = "./codegen" }
-synthez-core = { version = "0.1.0-dev", path = "./core" }
+synthez-codegen = { version = "0.1.0", path = "./codegen" }
+synthez-core = { version = "0.1.0", path = "./core" }
 
 [workspace]
 members = ["codegen", "core"]

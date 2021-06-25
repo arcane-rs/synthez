@@ -1,6 +1,6 @@
 [package]
 name = "synthez-core"
-version = "0.1.0-dev"
+version = "0.1.0"
 edition = "2018"
 resolver = "2"
 description = "Internal implementations of synthez crate"
@@ -11,6 +11,7 @@ homepage = "https://github.com/arcana-rs/synthez/tree/master/core"
 repository = "https://github.com/arcana-rs/synthez/tree/master/core"
 readme = "README.md"
 categories = ["development-tools::procedural-macro-helpers"]
+include = ["/src/", "/Cargo.toml", "/README.md"]
 
 [features]
 # Same as `full` feature of `syn` crate.
@@ -28,7 +29,7 @@ sealed = { version = "0.3", default-features = false }
     features = ["clone-impls", "derive", "extra-traits", "parsing", "printing"]
 
 [dev-dependencies]
-synthez = { version = "0.1.0-dev", path = "..", features = ["full"] }
+synthez = { version = "0.1.0", path = "..", features = ["full"] }
 
 [package.metadata.docs.rs]
 all-features = true

@@ -1,5 +1,14 @@
 //! Steroids for [`syn`], [`quote`] and [`proc_macro2`] crates.
 //!
+//! # Cargo features
+//!
+//! ### `full`
+//!
+//! Same as `full` feature of [`syn`] crate.
+//!
+//! Enables support of data structures for representing the syntax tree of all
+//! valid Rust source code, including items and expressions.
+//!
 //! # Example of writing `proc_macro_derive`
 //!
 //! This is an example of how this library can be used to write a simplified
