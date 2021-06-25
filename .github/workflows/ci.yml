@@ -187,12 +187,6 @@ jobs:
     name: Release on crates.io
     needs: ['release-github']
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-    strategy:
-      matrix:
-        crate:
-          - core
-          - codegen
-          - ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -201,5 +195,14 @@ jobs:
           profile: minimal
           toolchain: stable
 
-      - run: cargo publish --token ${{ secrets.CRATESIO_TOKEN }}
-        working-directory: ./${{ matrix.crate }}
+      - name: Publish `synthez-core` crate
+        run: cargo publish --token ${{ secrets.CRATESIO_TOKEN }}
+        working-directory: ./core
+
+      - name: Publish `synthez-codegen` crate
+        run: cargo publish --token ${{ secrets.CRATESIO_TOKEN }}
+        working-directory: ./codegen
+
+      - name: Publish `synthez` crate
+        run: cargo publish --token ${{ secrets.CRATESIO_TOKEN }}
+        working-directory: ./

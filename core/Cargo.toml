@@ -29,7 +29,7 @@ sealed = { version = "0.3", default-features = false }
     features = ["clone-impls", "derive", "extra-traits", "parsing", "printing"]
 
 [dev-dependencies]
-synthez = { version = "0.1.0", path = "..", features = ["full"] }
+synthez = { path = "..", features = ["full"] }
 
 [package.metadata.docs.rs]
 all-features = true

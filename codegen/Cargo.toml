@@ -28,7 +28,7 @@ synthez-core = { version = "0.1.0", path = "../core" }
     features = ["parsing", "proc-macro"]
 
 [dev-dependencies]
-synthez = { version = "0.1.0", path = "..", features = ["full"] }
+synthez = { path = "..", features = ["full"] }
 [dev-dependencies.syn]
     version = "1.0.72"
     default-features = false
