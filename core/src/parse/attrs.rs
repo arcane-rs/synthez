@@ -8,7 +8,7 @@ use crate::has;
 use super::err;
 
 #[doc(inline)]
-pub use self::{dedup::Dedup, kind::Kind, validate::Validate};
+pub use self::{dedup::Dedup, kind::Kind, validate::Validation};
 
 /// [`Parse`]ing of [`syn::Attribute`]s into a custom defined struct.
 pub trait Attrs: Default + Parse {
@@ -72,6 +72,31 @@ pub trait Attrs: Default + Parse {
                 parsed.validate(name, item.span())?;
                 Ok(parsed)
             })
+    }
+}
+
+impl<V: Attrs + Default + Parse> Attrs for Box<V> {
+    #[inline]
+    fn try_merge(self, another: Self) -> syn::Result<Self> {
+        (*self).try_merge(*another).map(Self::new)
+    }
+
+    #[inline]
+    fn validate(&self, attr_name: &str, item_span: Span) -> syn::Result<()> {
+        (&**self).validate(attr_name, item_span)
+    }
+
+    #[inline]
+    fn fallback(&mut self, attrs: &[syn::Attribute]) -> syn::Result<()> {
+        (&mut **self).fallback(attrs)
+    }
+
+    #[inline]
+    fn parse_attrs<T>(name: &str, item: &T) -> syn::Result<Self>
+    where
+        T: has::Attrs + Spanned,
+    {
+        V::parse_attrs(name, item).map(Self::new)
     }
 }
 
@@ -913,14 +938,7 @@ pub mod validate {
     //!
     //! [`Attrs`]: super::Attrs
 
-    use std::{
-        collections::{HashMap, HashSet},
-        hash::{BuildHasher, Hash},
-    };
-
     use sealed::sealed;
-
-    use crate::Required;
 
     #[doc(inline)]
     pub use self::rule::Rule;
@@ -930,74 +948,145 @@ pub mod validate {
     ///
     /// [`Attrs`]: super::Attrs
     /// [`field::Container`]: crate::field::Container
-    pub trait Validate<R: Rule + ?Sized> {
+    pub trait Validation<R: Rule + ?Sized> {
         /// Checks whether the validation [`Rule`] is satisfied.
-        #[must_use]
-        fn validate(&self) -> bool;
+        ///
+        /// # Errors
+        ///
+        /// If validation fails.
+        fn validation(&self) -> syn::Result<()>;
     }
 
-    impl<V> Validate<rule::Provided> for Required<V> {
-        #[inline]
-        fn validate(&self) -> bool {
-            self.is_present()
+    mod option {
+        use super::{rule, Validation};
+
+        impl<V> Validation<rule::Provided> for Option<V> {
+            #[inline]
+            fn validation(&self) -> syn::Result<()> {
+                Ok(())
+            }
         }
     }
 
-    impl<V> Validate<rule::Provided> for Option<V> {
-        #[inline]
-        fn validate(&self) -> bool {
-            true
+    mod required {
+        use proc_macro2::Span;
+
+        use crate::Required;
+
+        use super::{rule, Validation};
+
+        impl<V> Validation<rule::Provided> for Required<V> {
+            #[inline]
+            fn validation(&self) -> syn::Result<()> {
+                self.is_present().then(|| ()).ok_or_else(|| {
+                    syn::Error::new(
+                        Span::call_site(),
+                        "is expected to be present, but is absent",
+                    )
+                })
+            }
         }
     }
 
-    impl<V, S> Validate<rule::Provided> for HashSet<V, S>
-    where
-        V: Eq + Hash,
-        S: BuildHasher,
-    {
-        #[inline]
-        fn validate(&self) -> bool {
-            true
+    mod vec {
+        use super::{rule, Validation};
+
+        impl<V> Validation<rule::Provided> for Vec<V> {
+            #[inline]
+            fn validation(&self) -> syn::Result<()> {
+                Ok(())
+            }
         }
     }
 
-    impl<V> Validate<rule::Provided> for Vec<V> {
-        #[inline]
-        fn validate(&self) -> bool {
-            true
-        }
-    }
+    mod hashset {
+        use std::{
+            collections::HashSet,
+            hash::{BuildHasher, Hash},
+        };
 
-    impl<K, V, S> Validate<rule::Provided> for HashMap<K, V, S>
-    where
-        K: Eq + Hash,
-        S: BuildHasher,
-    {
-        #[inline]
-        fn validate(&self) -> bool {
-            true
-        }
-    }
+        use super::{rule, Validation};
 
-    /// [`Validate`] trait's shim allowing to specify its [`Rule`] as a method's
-    /// type parameter.
-    #[sealed]
-    pub trait IsValid {
-        /// Checks whether the specified validation [`Rule`] is satisfied.
-        #[must_use]
-        fn is_valid<R: Rule + ?Sized>(&self) -> bool
+        impl<V, S> Validation<rule::Provided> for HashSet<V, S>
         where
-            Self: Validate<R>;
-    }
-
-    #[sealed]
-    impl<T: ?Sized> IsValid for T {
-        #[inline]
-        fn is_valid<R: Rule + ?Sized>(&self) -> bool
-        where
-            Self: Validate<R>,
+            V: Eq + Hash,
+            S: BuildHasher,
         {
-            self.validate()
+            #[inline]
+            fn validation(&self) -> syn::Result<()> {
+                Ok(())
+            }
+        }
+    }
+
+    mod btreeset {
+        use std::collections::BTreeSet;
+
+        use super::{rule, Validation};
+
+        impl<V: Ord> Validation<rule::Provided> for BTreeSet<V> {
+            #[inline]
+            fn validation(&self) -> syn::Result<()> {
+                Ok(())
+            }
+        }
+    }
+
+    mod hashmap {
+        use std::{
+            collections::HashMap,
+            hash::{BuildHasher, Hash},
+        };
+
+        use super::{rule, Validation};
+
+        impl<K, V, S> Validation<rule::Provided> for HashMap<K, V, S>
+        where
+            K: Eq + Hash,
+            S: BuildHasher,
+        {
+            #[inline]
+            fn validation(&self) -> syn::Result<()> {
+                Ok(())
+            }
+        }
+    }
+
+    mod btreemap {
+        use std::collections::BTreeMap;
+
+        use super::{rule, Validation};
+
+        impl<K: Ord, V> Validation<rule::Provided> for BTreeMap<K, V> {
+            #[inline]
+            fn validation(&self) -> syn::Result<()> {
+                Ok(())
+            }
+        }
+    }
+
+    /// [`Validation`] trait's shim allowing to specify its [`Rule`] as a
+    /// method's type parameter.
+    #[sealed]
+    pub trait Validate {
+        /// Checks whether the specified validation [`Rule`] is satisfied.
+        ///
+        /// # Errors
+        ///
+        /// If validation fails.
+        fn validate<R: Rule + ?Sized>(&self) -> syn::Result<()>
+        where
+            Self: Validation<R>;
+    }
+
+    #[sealed]
+    impl<T: ?Sized> Validate for T {
+        #[inline]
+        fn validate<R: Rule + ?Sized>(&self) -> syn::Result<()>
+        where
+            Self: Validation<R>,
+        {
+            self.validation()
         }
     }
 

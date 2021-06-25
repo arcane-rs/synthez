@@ -13,7 +13,7 @@ jobs:
 
   clippy:
     if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/synthez-')
+            || startsWith(github.ref, 'refs/tags/v')
             || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
@@ -24,14 +24,11 @@ jobs:
           toolchain: stable
           components: clippy
 
-      - uses: Swatinem/rust-cache@v1
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-
-      - run: make cargo.lint
+      - run: make lint
 
   rustfmt:
     if: ${{ github.ref == 'refs/heads/master'
-            || startsWith(github.ref, 'refs/tags/synthez-')
+            || startsWith(github.ref, 'refs/tags/v')
             || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
@@ -42,7 +39,75 @@ jobs:
           toolchain: nightly
           components: rustfmt
 
-      - run: make cargo.fmt check=yes
+      - run: make fmt check=yes
+
+
+
+
+  ###########
+  # Testing #
+  ###########
+
+  test:
+    name: Tests
+    if: ${{ github.ref == 'refs/heads/master'
+            || startsWith(github.ref, 'refs/tags/v')
+            || !contains(github.event.head_commit.message, '[skip ci]') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        crate:
+          - synthez-core
+          - synthez-codegen
+          - synthez
+        os:
+          - ubuntu
+          - macOS
+          - windows
+        toolchain:
+          - stable
+          - beta
+          - nightly
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.toolchain }}
+          override: true
+
+      - run: make test crate=${{ matrix.crate }}
+
+  msrv:
+    name: MSRV
+    if: ${{ github.ref == 'refs/heads/master'
+            || startsWith(github.ref, 'refs/tags/v')
+            || !contains(github.event.head_commit.message, '[skip ci]') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        msrv: ['1.52.0']
+        os:
+          - ubuntu
+          - macOS
+          - windows
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.msrv }}
+          override: true
+
+      - run: cargo +nightly update -Z minimal-versions
+
+      - run: make test
 
 
 
@@ -69,7 +134,4 @@ jobs:
           profile: minimal
           toolchain: stable
 
-      - uses: Swatinem/rust-cache@v1
-        if: ${{ !contains(github.event.head_commit.message, '[fresh ci]') }}
-
-      - run: make cargo.doc crate=${{ matrix.crate }} open=no clean=yes
+      - run: make doc crate=${{ matrix.crate }} open=no clean=yes

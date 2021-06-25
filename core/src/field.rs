@@ -3,7 +3,7 @@
 use std::{
     collections::{BTreeMap, BTreeSet, HashMap, HashSet},
     hash::{BuildHasher, Hash},
-    mem,
+    iter, mem,
     ops::{Deref, DerefMut},
 };
 
@@ -275,5 +275,35 @@ impl<T> DerefMut for Required<T> {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.0.as_mut().unwrap()
+    }
+}
+
+impl<T> IntoIterator for Required<T> {
+    type Item = T;
+    type IntoIter = iter::Once<T>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        iter::once(self.0.unwrap())
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Required<T> {
+    type Item = &'a T;
+    type IntoIter = iter::Once<&'a T>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        iter::once(self.0.as_ref().unwrap())
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Required<T> {
+    type Item = &'a mut T;
+    type IntoIter = iter::Once<&'a mut T>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter {
+        iter::once(self.0.as_mut().unwrap())
     }
 }

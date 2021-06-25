@@ -16,7 +16,7 @@ use crate::{
             dedup,
             field::TryMerge as _,
             kind,
-            validate::{rule, IsValid as _},
+            validate::{rule, Validate as _},
         },
         err,
         ext::ParseBuffer as _,
@@ -190,49 +190,12 @@ impl Definition {
         let (impl_generics, ty_generics, where_clause) =
             self.generics.split_for_impl();
 
-        let try_merge_fields = self.fields.iter().map(|f| {
-            let field = &f.ident;
-            let ty = &f.ty;
-            let kind = f.kind;
-            let dedup = f.dedup;
+        let try_merge_fields = self.fields.iter().map(Field::gen_merge);
 
-            quote! {
-                <#ty as ::synthez::parse::attrs::field::TryApplySelf<
-                    _, #kind, #dedup,
-                >>::try_apply_self(&mut self.#field, another.#field)?;
-            }
-        });
-
-        let validate_inited_fields = self.fields.iter().map(|f| {
-            let field = &f.ident;
-            let ty = &f.ty;
-
-            let arg_names = if f.names.len() > 1 {
-                format!(
-                    "either `{}` or `{}`",
-                    &f.names[..(f.names.len() - 1)].join("`, `"),
-                    f.names.last().unwrap(),
-                )
-            } else {
-                format!("`{}`", f.names.first().unwrap())
-            };
-            let err_msg = format!(
-                "{} argument of `#[{{}}]` attribute is expected, but is absent",
-                arg_names,
-            );
-
-            quote! {
-                if !<#ty as ::synthez::parse::attrs::Validate<
-                    ::synthez::parse::attrs::validate::rule::Provided,
-                >>::validate(&self.#field) {
-                    return Err(::synthez::syn::Error::new(
-                        item_span,
-                        format!(#err_msg, attr_name),
-                    ));
-                }
-            }
-        });
-
+        let validate_provided_fields =
+            self.fields.iter().map(Field::gen_validate_provided);
+        let validate_nested_fields =
+            self.fields.iter().filter_map(Field::gen_validate_nested);
         let validate_custom_fields = self.fields.iter().flat_map(|f| {
             let field = &f.ident;
             f.validators.iter().map(move |validator| {
@@ -242,28 +205,15 @@ impl Definition {
             })
         });
 
-        let fallback_fields = self
-            .fields
-            .iter()
-            .flat_map(|f| {
-                let field = &f.ident;
-                f.fallbacks.iter().map(move |fallback| {
-                    quote! {
-                        #fallback(&mut self.#field, attrs)?;
-                    }
-                })
-            })
-            .collect::<Vec<_>>();
-        let fallback_method = (!fallback_fields.is_empty()).then(|| {
-            quote! {
-                fn fallback(
-                    &mut self,
-                    attrs: &[::synthez::syn::Attribute],
-                ) -> ::synthez::syn::Result<()> {
-                    #( #fallback_fields )*
-                    Ok(())
+        let fallback_nested_fields =
+            self.fields.iter().filter_map(Field::gen_fallback_nested);
+        let fallback_custom_fields = self.fields.iter().flat_map(|f| {
+            let field = &f.ident;
+            f.fallbacks.iter().map(move |fallback| {
+                quote! {
+                    #fallback(&mut self.#field, attrs)?;
                 }
-            }
+            })
         });
 
         quote! {
@@ -284,12 +234,20 @@ impl Definition {
                     attr_name: &str,
                     item_span: ::synthez::proc_macro2::Span,
                 ) -> ::synthez::syn::Result<()> {
-                    #( #validate_inited_fields )*
+                    #( #validate_provided_fields )*
+                    #( #validate_nested_fields )*
                     #( #validate_custom_fields )*
                     Ok(())
                 }
 
-                #fallback_method
+                fn fallback(
+                    &mut self,
+                    attrs: &[::synthez::syn::Attribute],
+                ) -> ::synthez::syn::Result<()> {
+                    #( #fallback_nested_fields )*
+                    #( #fallback_custom_fields )*
+                    Ok(())
+                }
             }
         }
     }
@@ -348,6 +306,97 @@ impl TryFrom<syn::Field> for Field {
             names: names.into_iter().map(|n| n.to_string()).collect(),
             validators: attrs.validators,
             fallbacks: attrs.fallbacks,
+        })
+    }
+}
+
+impl Field {
+    /// Generates code of merging this [`Field`] with another one.
+    #[must_use]
+    fn gen_merge(&self) -> TokenStream {
+        let field = &self.ident;
+        let ty = &self.ty;
+        let kind = self.kind;
+        let dedup = self.dedup;
+
+        quote! {
+            <#ty as ::synthez::parse::attrs::field::TryApplySelf<
+                _, #kind, #dedup,
+            >>::try_apply_self(&mut self.#field, another.#field)?;
+        }
+    }
+
+    /// Generates code of [`rule::Provided`] validation for this [`Field`].
+    #[must_use]
+    fn gen_validate_provided(&self) -> TokenStream {
+        let field = &self.ident;
+        let ty = &self.ty;
+
+        let arg_names = if self.names.len() > 1 {
+            format!(
+                "either `{}` or `{}`",
+                &self.names[..(self.names.len() - 1)].join("`, `"),
+                self.names.last().unwrap(),
+            )
+        } else {
+            format!("`{}`", self.names.first().unwrap())
+        };
+        let err_msg =
+            format!("{} argument of `#[{{}}]` attribute {{}}", arg_names);
+
+        quote! {
+            if let Err(e) = <#ty as ::synthez::parse::attrs::Validation<
+                ::synthez::parse::attrs::validate::rule::Provided,
+            >>::validation(&self.#field) {
+                return Err(::synthez::syn::Error::new(
+                    item_span,
+                    format!(#err_msg, attr_name, e),
+                ));
+            }
+        }
+    }
+
+    /// Generates code of [`kind::Nested`] validation for this [`Field`], if it
+    /// represents the one.
+    #[must_use]
+    fn gen_validate_nested(&self) -> Option<TokenStream> {
+        if self.kind != Kind::Nested {
+            return None;
+        }
+
+        let field = &self.ident;
+        let attr_fmt = format!("{{}}({})", self.names.first().unwrap());
+
+        Some(quote! {
+            for v in &self.#field {
+                ::synthez::parse::Attrs::validate(
+                    &**v,
+                    &format!(#attr_fmt, attr_name),
+                    ::synthez::syn::spanned::Spanned::span(v),
+                )?;
+            }
+        })
+    }
+
+    /// Generates code of [`kind::Nested`] fallback for this [`Field`], if it
+    /// represents the one.
+    #[must_use]
+    fn gen_fallback_nested(&self) -> Option<TokenStream> {
+        if self.kind != Kind::Nested {
+            return None;
+        }
+
+        let field = &self.ident;
+        let ty = &self.ty;
+
+        Some(quote! {
+            if !<#ty as ::synthez::field::Container<_>>::is_empty(
+                &self.#field,
+            ) {
+                for v in &mut self.#field {
+                    ::synthez::parse::Attrs::fallback(&mut **v, attrs)?;
+                }
+            }
         })
     }
 }
@@ -471,7 +520,7 @@ impl ParseAttrs for FieldAttrs {
     }
 
     fn validate(&self, attr_name: &str, item_span: Span) -> syn::Result<()> {
-        if !self.kind.is_valid::<rule::Provided>() {
+        if self.kind.validate::<rule::Provided>().is_err() {
             return Err(syn::Error::new(
                 item_span,
                 format!(

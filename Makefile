@@ -66,9 +66,24 @@ cargo.lint:
 
 
 
+####################
+# Testing commands #
+####################
+
+# Run Rust tests of project.
+#
+# Usage:
+#	make test [crate=<crate-name>]
+
+test:
+	cargo test $(if $(call eq,$(crate),),--workspace,-p $(crate)) --all-features
+
+
+
+
 ##################
 # .PHONY section #
 ##################
 
-.PHONY: doc fmt lint \
+.PHONY: doc fmt lint test \
         cargo.doc cargo.fmt cargo.lint

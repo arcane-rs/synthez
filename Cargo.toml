@@ -26,9 +26,6 @@ full = ["synthez-core/full"]
 synthez-codegen = { version = "0.1.0-dev", path = "./codegen" }
 synthez-core = { version = "0.1.0-dev", path = "./core" }
 
-[dev-dependencies]
-syn = "1.0"
-
 [workspace]
 members = ["codegen", "core"]
 
