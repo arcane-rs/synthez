@@ -3,8 +3,9 @@
 use std::{collections::HashSet, convert::TryFrom, iter};
 
 use proc_macro2::{Span, TokenStream};
-use quote::{quote, ToTokens, TokenStreamExt as _};
+use quote::{quote, ToTokens};
 use syn::{
+    ext::IdentExt as _,
     parse::{Parse, ParseStream},
     token,
 };
@@ -256,7 +257,8 @@ impl Definition {
 /// Representation of a [`ParseAttrs`]'s field, used for code generation.
 #[derive(Debug)]
 struct Field {
-    /// [`syn::Ident`] of this [`Field`] in the original code.
+    /// [`syn::Ident`] of this [`Field`] in the original code (without possible
+    /// `r#` part).
     ident: syn::Ident,
 
     /// [`syn::Type`] of this [`Field`] (with [`field::Container`]).
@@ -292,7 +294,7 @@ impl TryFrom<syn::Field> for Field {
         let ident = field.ident.unwrap();
 
         let mut names = if attrs.args.is_empty() {
-            iter::once(ident.clone()).collect()
+            iter::once(ident.unraw()).collect()
         } else {
             attrs.args
         };
@@ -591,16 +593,17 @@ impl Parse for Spanning<Kind> {
 }
 
 impl ToTokens for Kind {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
+    fn to_tokens(&self, out: &mut TokenStream) {
         let variant = syn::Ident::new_on_call_site(match self {
             Self::Ident => "Ident",
             Self::Nested => "Nested",
             Self::Value(_) => "Value",
             Self::Map => "Map",
         });
-        tokens.append_all(&[quote! {
+        (quote! {
             ::synthez::parse::attrs::kind::#variant
-        }]);
+        })
+        .to_tokens(out);
     }
 }
 
@@ -645,14 +648,15 @@ impl Parse for Spanning<Dedup> {
 }
 
 impl ToTokens for Dedup {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
+    fn to_tokens(&self, out: &mut TokenStream) {
         let variant = syn::Ident::new_on_call_site(match self {
             Self::Unique => "Unique",
             Self::First => "First",
             Self::Last => "Last",
         });
-        tokens.append_all(&[quote! {
+        (quote! {
             ::synthez::parse::attrs::dedup::#variant
-        }]);
+        })
+        .to_tokens(out);
     }
 }

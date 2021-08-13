@@ -6,6 +6,20 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.1.1] · 2021-08-13
+[0.1.1]: /../../tree/v0.1.1
+
+[Diff](/../../compare/v0.1.0...v0.1.1)
+
+### Fixed
+
+- Raw identifiers (with `r#`) expanding as-is. ([#1])
+
+[#1]: /../../pull/1
+
+
+
+
 ## [0.1.0] · 2021-06-25
 [0.1.0]: /../../tree/v0.1.0
 

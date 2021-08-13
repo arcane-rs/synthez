@@ -1,6 +1,6 @@
 [package]
 name = "synthez-codegen"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2018"
 resolver = "2"
 description = "Internal codegen shim of synthez crate"
@@ -17,7 +17,7 @@ include = ["/src/", "/Cargo.toml", "/README.md"]
 proc-macro = true
 
 [dependencies]
-synthez-core = { version = "0.1.0", path = "../core" }
+synthez-core = { version = "0.1.1", path = "../core" }
 [dependencies.proc-macro2]
     version = "1.0.4"
     default-features = false

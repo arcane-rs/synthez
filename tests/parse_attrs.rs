@@ -449,6 +449,35 @@ mod ident {
             assert_eq!(err, "wrong!");
         }
     }
+
+    mod raw {
+        use synthez::proc_macro2::Span;
+
+        use super::*;
+
+        #[derive(Debug, Default, ParseAttrs)]
+        struct Attr {
+            #[parse(ident)]
+            r#type: Option<syn::token::Type>,
+        }
+
+        #[test]
+        fn is_unrawed() {
+            let input: syn::DeriveInput = syn::parse_quote! {
+                #[attr(type)]
+                struct Dummy;
+            };
+
+            let _ident = syn::Ident::new_on_call_site("type");
+            let res = Attr::parse_attrs("attr", &input);
+            assert!(res.is_ok(), "failed: {}", res.unwrap_err());
+
+            assert_eq!(
+                res.unwrap().r#type,
+                Some(syn::Token![type](Span::call_site())),
+            );
+        }
+    }
 }
 
 mod value {
@@ -1043,6 +1072,32 @@ mod value {
             );
         }
     }
+
+    mod raw {
+        use super::*;
+
+        #[derive(Debug, Default, ParseAttrs)]
+        struct Attr {
+            #[parse(value)]
+            r#type: Option<syn::Ident>,
+        }
+
+        #[test]
+        fn is_unrawed() {
+            let input: syn::DeriveInput = syn::parse_quote! {
+                #[attr(type = minas)]
+                struct Dummy;
+            };
+
+            let res = Attr::parse_attrs("attr", &input);
+            assert!(res.is_ok(), "failed: {}", res.unwrap_err());
+
+            assert_eq!(
+                res.unwrap().r#type,
+                Some(syn::Ident::new_on_call_site("minas")),
+            );
+        }
+    }
 }
 
 mod map {
@@ -1572,6 +1627,47 @@ mod map {
 
             let err = res.unwrap_err().to_string();
             assert_eq!(err, "expected `=`");
+        }
+    }
+
+    mod raw {
+        use super::*;
+
+        #[derive(Debug, Default, ParseAttrs)]
+        struct Attr {
+            #[parse(map)]
+            r#type: HashMap<syn::Ident, syn::LitStr>,
+        }
+
+        #[test]
+        fn is_unrawed() {
+            let input: syn::DeriveInput = syn::parse_quote! {
+                #[attr(type minas = "tirith")]
+                #[attr(type loth = "lorien")]
+                struct Dummy;
+            };
+
+            let res = Attr::parse_attrs("attr", &input);
+            assert!(res.is_ok(), "failed: {}", res.unwrap_err());
+
+            let out = res.unwrap().r#type;
+            assert_eq!(out.len(), 2, "wrong length of {:?}", out);
+            assert_eq!(
+                out.get(&syn::Ident::new_on_call_site("minas"))
+                    .map(syn::LitStr::value)
+                    .as_deref(),
+                Some("tirith"),
+                "wrong item of {:?}",
+                out,
+            );
+            assert_eq!(
+                out.get(&syn::Ident::new_on_call_site("loth"))
+                    .map(syn::LitStr::value)
+                    .as_deref(),
+                Some("lorien"),
+                "wrong item of {:?}",
+                out,
+            );
         }
     }
 }
