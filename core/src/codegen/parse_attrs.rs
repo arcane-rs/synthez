@@ -600,7 +600,7 @@ impl ToTokens for Kind {
         });
         tokens.append_all(&[quote! {
             ::synthez::parse::attrs::kind::#variant
-        }])
+        }]);
     }
 }
 
@@ -653,6 +653,6 @@ impl ToTokens for Dedup {
         });
         tokens.append_all(&[quote! {
             ::synthez::parse::attrs::dedup::#variant
-        }])
+        }]);
     }
 }
