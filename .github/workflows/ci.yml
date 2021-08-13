@@ -199,9 +199,15 @@ jobs:
         run: cargo publish --token ${{ secrets.CRATESIO_TOKEN }}
         working-directory: ./core
 
+      - name: Wait crates.io index is updated
+        run: sleep 120
+
       - name: Publish `synthez-codegen` crate
         run: cargo publish --token ${{ secrets.CRATESIO_TOKEN }}
         working-directory: ./codegen
+
+      - name: Wait crates.io index is updated
+        run: sleep 120
 
       - name: Publish `synthez` crate
         run: cargo publish --token ${{ secrets.CRATESIO_TOKEN }}
