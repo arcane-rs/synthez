@@ -24,8 +24,8 @@ include = ["/src/", "/Cargo.toml", "/CHANGELOG.md", "/LICENSE.md", "/README.md"]
 full = ["synthez-core/full"]
 
 [dependencies]
-synthez-codegen = { version = "0.1.0", path = "./codegen" }
-synthez-core = { version = "0.1.0", path = "./core" }
+synthez-codegen = { version = "0.1.1", path = "./codegen" }
+synthez-core = { version = "0.1.1", path = "./core" }
 
 [workspace]
 members = ["codegen", "core"]

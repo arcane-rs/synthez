@@ -66,7 +66,7 @@ pub trait Container<V> {
     /// previous one, if any.
     #[inline]
     fn set(&mut self, value: V) {
-        drop(self.replace(value));
+        drop(self.replace(value))
     }
 }
 

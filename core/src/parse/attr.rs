@@ -41,7 +41,7 @@ pub fn doc_string(
         }
     }
     if !out.is_empty() {
-        out.truncate(out.trim_end().len());
+        out.truncate(out.trim_end().len())
     }
 
     Ok(span.map(|s| Spanning::new(out, s)))
