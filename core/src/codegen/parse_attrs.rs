@@ -5,6 +5,7 @@ use std::{collections::HashSet, convert::TryFrom, iter};
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens, TokenStreamExt as _};
 use syn::{
+    ext::IdentExt as _,
     parse::{Parse, ParseStream},
     token,
 };
@@ -256,7 +257,8 @@ impl Definition {
 /// Representation of a [`ParseAttrs`]'s field, used for code generation.
 #[derive(Debug)]
 struct Field {
-    /// [`syn::Ident`] of this [`Field`] in the original code.
+    /// Unrawed (without `r#`) [`syn::Ident`] of this [`Field`] in the original
+    /// code.
     ident: syn::Ident,
 
     /// [`syn::Type`] of this [`Field`] (with [`field::Container`]).
@@ -292,7 +294,7 @@ impl TryFrom<syn::Field> for Field {
         let ident = field.ident.unwrap();
 
         let mut names = if attrs.args.is_empty() {
-            iter::once(ident.clone()).collect()
+            iter::once(ident.unraw()).collect()
         } else {
             attrs.args
         };

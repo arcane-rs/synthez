@@ -1,7 +1,46 @@
 #![forbid(non_ascii_idents, unsafe_code)]
 
 mod ident {
-    use synthez::{syn, IdentExt as _, ParseAttrs};
+    use synthez::{proc_macro2::Span, syn, IdentExt as _, ParseAttrs};
+
+    mod raw_identifiers {
+        use super::*;
+
+        #[derive(Debug, Default, ParseAttrs)]
+        struct Attr {
+            #[parse(ident)]
+            r#type: Option<syn::token::Type>,
+        }
+
+        #[test]
+        fn allows_present() {
+            let input: syn::DeriveInput = syn::parse_quote! {
+                #[attr(type)]
+                struct Dummy;
+            };
+
+            let _ident = syn::Ident::new_on_call_site("type");
+            let res = Attr::parse_attrs("attr", &input);
+            assert!(res.is_ok(), "failed: {}", res.unwrap_err());
+
+            assert_eq!(
+                res.unwrap().r#type,
+                Some(syn::Token![type](Span::call_site())),
+            );
+        }
+
+        #[test]
+        fn allows_absent() {
+            let input: syn::DeriveInput = syn::parse_quote! {
+                struct Dummy;
+            };
+
+            let res = Attr::parse_attrs("attr", &input);
+            assert!(res.is_ok(), "failed: {}", res.unwrap_err());
+
+            assert_eq!(res.unwrap().r#type, None);
+        }
+    }
 
     mod option {
         use super::*;
@@ -126,9 +165,7 @@ mod ident {
 
             let err = res.unwrap_err().to_string();
             assert!(
-                err.contains(
-                    "`required` argument of `#[attr]` attribute is expected",
-                ),
+                err.contains("`required` argument of `#[attr]` attribute is expected",),
                 "wrong err:\n{}",
                 err,
             );
@@ -460,13 +497,13 @@ mod value {
         #[derive(Debug, Default, ParseAttrs)]
         struct Attr {
             #[parse(value)]
-            name: Option<syn::Ident>,
+            r#type: Option<syn::Ident>,
         }
 
         #[test]
         fn allows_present() {
             let input: syn::DeriveInput = syn::parse_quote! {
-                #[attr(name = minas)]
+                #[attr(type = minas)]
                 struct Dummy;
             };
 
@@ -474,7 +511,7 @@ mod value {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             assert_eq!(
-                res.unwrap().name,
+                res.unwrap().r#type,
                 Some(syn::Ident::new_on_call_site("minas")),
             );
         }
@@ -488,7 +525,7 @@ mod value {
             let res = Attr::parse_attrs("attr", &input);
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
-            assert_eq!(res.unwrap().name, None);
+            assert_eq!(res.unwrap().r#type, None);
         }
     }
 
@@ -560,10 +597,7 @@ mod value {
             let res = Attr::parse_attrs("attr", &input);
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
-            assert_eq!(
-                *res.unwrap().name,
-                syn::Ident::new_on_call_site("minas"),
-            );
+            assert_eq!(*res.unwrap().name, syn::Ident::new_on_call_site("minas"),);
         }
 
         #[test]
@@ -577,9 +611,7 @@ mod value {
 
             let err = res.unwrap_err().to_string();
             assert!(
-                err.contains(
-                    "`name` argument of `#[attr]` attribute is expected",
-                ),
+                err.contains("`name` argument of `#[attr]` attribute is expected",),
                 "wrong err:\n{}",
                 err,
             );
@@ -611,10 +643,7 @@ mod value {
             let res = Attr::parse_attrs("attr", &input);
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
-            assert_eq!(
-                *res.unwrap().name,
-                syn::Ident::new_on_call_site("minas"),
-            );
+            assert_eq!(*res.unwrap().name, syn::Ident::new_on_call_site("minas"),);
         }
 
         #[test]
@@ -626,10 +655,7 @@ mod value {
             let res = Attr::parse_attrs("attr", &input);
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
-            assert_eq!(
-                *res.unwrap().name,
-                syn::Ident::new_on_call_site("fallen"),
-            );
+            assert_eq!(*res.unwrap().name, syn::Ident::new_on_call_site("fallen"),);
         }
     }
 
@@ -1056,21 +1082,21 @@ mod map {
         #[derive(Debug, Default, ParseAttrs)]
         struct Attr {
             #[parse(map)]
-            on: HashMap<syn::Ident, syn::LitStr>,
+            r#type: HashMap<syn::Ident, syn::LitStr>,
         }
 
         #[test]
         fn allows_present() {
             let input: syn::DeriveInput = syn::parse_quote! {
-                #[attr(on minas = "tirith")]
-                #[attr(on loth = "lorien")]
+                #[attr(type minas = "tirith")]
+                #[attr(type loth = "lorien")]
                 struct Dummy;
             };
 
             let res = Attr::parse_attrs("attr", &input);
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
-            let out = res.unwrap().on;
+            let out = res.unwrap().r#type;
             assert_eq!(out.len(), 2, "wrong length of {:?}", out);
             assert_eq!(
                 out.get(&syn::Ident::new_on_call_site("minas"))
@@ -1100,7 +1126,7 @@ mod map {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             assert_eq!(
-                res.unwrap().on,
+                res.unwrap().r#type,
                 <HashMap<syn::Ident, syn::LitStr>>::new(),
             );
         }
@@ -1117,9 +1143,7 @@ mod map {
             on: HashMap<syn::Ident, syn::LitStr>,
         }
 
-        fn use_back(
-            _: &[syn::Attribute],
-        ) -> syn::Result<Option<(syn::Ident, syn::LitStr)>> {
+        fn use_back(_: &[syn::Attribute]) -> syn::Result<Option<(syn::Ident, syn::LitStr)>> {
             Ok(Some((
                 syn::Ident::new_on_call_site("fallen"),
                 syn::parse_quote!("fall"),
@@ -1605,11 +1629,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
-            assert!(
-                out.sub.is_some(),
-                "outer absent, but shouldn't: {:?}",
-                out,
-            );
+            assert!(out.sub.is_some(), "outer absent, but shouldn't: {:?}", out,);
             assert_eq!(
                 out.sub.unwrap().ignore,
                 Some(syn::Ident::new_on_call_site("ignore")),
@@ -1627,11 +1647,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
-            assert!(
-                out.sub.is_some(),
-                "outer absent, but shouldn't: {:?}",
-                out,
-            );
+            assert!(out.sub.is_some(), "outer absent, but shouldn't: {:?}", out,);
             assert!(
                 out.sub.as_ref().unwrap().ignore.is_none(),
                 "inner present, but shouldn't: {:?}",
@@ -1649,11 +1665,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
-            assert!(
-                out.sub.is_none(),
-                "outer present, but shouldn't: {:?}",
-                out,
-            );
+            assert!(out.sub.is_none(), "outer present, but shouldn't: {:?}", out,);
         }
     }
 
@@ -1668,9 +1680,7 @@ mod nested {
             ignore: Option<syn::Ident>,
         }
 
-        fn use_inner_back(
-            _: &[syn::Attribute],
-        ) -> syn::Result<Option<syn::Ident>> {
+        fn use_inner_back(_: &[syn::Attribute]) -> syn::Result<Option<syn::Ident>> {
             Ok(Some(syn::Ident::new_on_call_site("fallen")))
         }
 
@@ -1680,11 +1690,11 @@ mod nested {
             sub: Option<Spanning<Sub>>,
         }
 
-        fn use_outer_back(
-            _: &[syn::Attribute],
-        ) -> syn::Result<Option<Spanning<Sub>>> {
+        fn use_outer_back(_: &[syn::Attribute]) -> syn::Result<Option<Spanning<Sub>>> {
             Ok(Some(Spanning::new(
-                Sub { ignore: Some(syn::Ident::new_on_call_site("fall")) },
+                Sub {
+                    ignore: Some(syn::Ident::new_on_call_site("fall")),
+                },
                 Span::call_site(),
             )))
         }
@@ -1700,11 +1710,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
-            assert!(
-                out.sub.is_some(),
-                "outer absent, but shouldn't: {:?}",
-                out,
-            );
+            assert!(out.sub.is_some(), "outer absent, but shouldn't: {:?}", out,);
             assert_eq!(
                 out.sub.unwrap().ignore,
                 Some(syn::Ident::new_on_call_site("ignore"))
@@ -1722,11 +1728,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
-            assert!(
-                out.sub.is_some(),
-                "outer absent, but shouldn't: {:?}",
-                out,
-            );
+            assert!(out.sub.is_some(), "outer absent, but shouldn't: {:?}", out,);
             assert_eq!(
                 out.sub.unwrap().ignore,
                 Some(syn::Ident::new_on_call_site("fallen"))
@@ -1743,11 +1745,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
-            assert!(
-                out.sub.is_some(),
-                "outer absent, but shouldn't: {:?}",
-                out,
-            );
+            assert!(out.sub.is_some(), "outer absent, but shouldn't: {:?}", out,);
             assert_eq!(
                 out.sub.unwrap().ignore,
                 Some(syn::Ident::new_on_call_site("fall"))
@@ -1798,9 +1796,7 @@ mod nested {
 
             let err = res.unwrap_err().to_string();
             assert!(
-                err.contains(
-                    "`ignore` argument of `#[attr(sub)]` attribute is expected",
-                ),
+                err.contains("`ignore` argument of `#[attr(sub)]` attribute is expected",),
                 "wrong err:\n{}",
                 err,
             );
@@ -1817,9 +1813,7 @@ mod nested {
 
             let err = res.unwrap_err().to_string();
             assert!(
-                err.contains(
-                    "`sub` argument of `#[attr]` attribute is expected",
-                ),
+                err.contains("`sub` argument of `#[attr]` attribute is expected",),
                 "wrong err:\n{}",
                 err,
             );
@@ -1894,11 +1888,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
-            assert!(
-                out.sub.is_some(),
-                "outer absent, but shouldn't: {:?}",
-                out,
-            );
+            assert!(out.sub.is_some(), "outer absent, but shouldn't: {:?}", out,);
             assert_eq!(
                 out.sub.unwrap().ignore,
                 Some(syn::Ident::new_on_call_site("i"))
@@ -1960,11 +1950,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
-            assert!(
-                out.sub.is_some(),
-                "outer absent, but shouldn't: {:?}",
-                out,
-            );
+            assert!(out.sub.is_some(), "outer absent, but shouldn't: {:?}", out,);
             assert_eq!(
                 out.sub.unwrap().ignore,
                 Some(syn::Ident::new_on_call_site("i"))
@@ -1982,11 +1968,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
-            assert!(
-                out.sub.is_some(),
-                "outer absent, but shouldn't: {:?}",
-                out,
-            );
+            assert!(out.sub.is_some(), "outer absent, but shouldn't: {:?}", out,);
             assert_eq!(
                 out.sub.unwrap().ignore,
                 Some(syn::Ident::new_on_call_site("ignore"))
@@ -2004,11 +1986,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
-            assert!(
-                out.sub.is_some(),
-                "outer absent, but shouldn't: {:?}",
-                out,
-            );
+            assert!(out.sub.is_some(), "outer absent, but shouldn't: {:?}", out,);
             assert_eq!(
                 out.sub.unwrap().ignore,
                 Some(syn::Ident::new_on_call_site("i"))
@@ -2042,11 +2020,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
-            assert!(
-                out.sub.is_some(),
-                "outer absent, but shouldn't: {:?}",
-                out,
-            );
+            assert!(out.sub.is_some(), "outer absent, but shouldn't: {:?}", out,);
             assert_eq!(
                 out.sub.unwrap().ignore,
                 Some(syn::Ident::new_on_call_site("i"))
@@ -2064,11 +2038,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
-            assert!(
-                out.sub.is_some(),
-                "outer absent, but shouldn't: {:?}",
-                out,
-            );
+            assert!(out.sub.is_some(), "outer absent, but shouldn't: {:?}", out,);
             assert_eq!(
                 out.sub.unwrap().ignore,
                 Some(syn::Ident::new_on_call_site("skip"))
@@ -2192,11 +2162,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
-            assert!(
-                out.sub.is_some(),
-                "outer absent, but shouldn't: {:?}",
-                out,
-            );
+            assert!(out.sub.is_some(), "outer absent, but shouldn't: {:?}", out,);
             assert_eq!(
                 out.sub.unwrap().ignore,
                 Some(syn::Ident::new_on_call_site("skip"))
@@ -2231,11 +2197,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
-            assert!(
-                out.sub.is_some(),
-                "outer absent, but shouldn't: {:?}",
-                out,
-            );
+            assert!(out.sub.is_some(), "outer absent, but shouldn't: {:?}", out,);
             assert_eq!(
                 out.sub.unwrap().ignore,
                 Some(syn::Ident::new_on_call_site("ignore"))
