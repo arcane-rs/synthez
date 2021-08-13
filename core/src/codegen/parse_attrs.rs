@@ -603,7 +603,7 @@ impl ToTokens for Kind {
         (quote! {
             ::synthez::parse::attrs::kind::#variant
         })
-        .to_tokens(out)
+        .to_tokens(out);
     }
 }
 
@@ -657,6 +657,6 @@ impl ToTokens for Dedup {
         (quote! {
             ::synthez::parse::attrs::dedup::#variant
         })
-        .to_tokens(out)
+        .to_tokens(out);
     }
 }
