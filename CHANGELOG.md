@@ -6,6 +6,20 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.1.2] · ???
+[0.1.2]: /../../tree/v0.1.2
+
+[Diff](/../../compare/v0.1.1...v0.1.2)
+
+### Fixed
+
+- Non-deterministic error messages. ([#2])
+
+[#2]: /../../pull/2
+
+
+
+
 ## [0.1.1] · 2021-08-13
 [0.1.1]: /../../tree/v0.1.1
 

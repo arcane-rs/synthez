@@ -615,6 +615,70 @@ mod value {
         }
     }
 
+    mod required_aliased {
+        use synthez::Required;
+
+        use super::*;
+
+        #[derive(Debug, Default, ParseAttrs)]
+        struct Attr {
+            #[parse(value, alias = required)]
+            name: Required<syn::Ident>,
+        }
+
+        #[test]
+        fn allows_present() {
+            let input: syn::DeriveInput = syn::parse_quote! {
+                #[attr(name = minas)]
+                struct Dummy;
+            };
+
+            let res = Attr::parse_attrs("attr", &input);
+            assert!(res.is_ok(), "failed: {}", res.unwrap_err());
+
+            assert_eq!(
+                *res.unwrap().name,
+                syn::Ident::new_on_call_site("minas"),
+            );
+        }
+
+        #[test]
+        fn allows_alias() {
+            let input: syn::DeriveInput = syn::parse_quote! {
+                #[attr(required = tirith)]
+                struct Dummy;
+            };
+
+            let res = Attr::parse_attrs("attr", &input);
+            assert!(res.is_ok(), "failed: {}", res.unwrap_err());
+
+            assert_eq!(
+                *res.unwrap().name,
+                syn::Ident::new_on_call_site("tirith"),
+            );
+        }
+
+        #[test]
+        fn forbids_absent() {
+            let input: syn::DeriveInput = syn::parse_quote! {
+                struct Dummy;
+            };
+
+            let res = Attr::parse_attrs("attr", &input);
+            assert!(res.is_err(), "should fail, but is ok");
+
+            let err = res.unwrap_err().to_string();
+            assert!(
+                err.contains(
+                    "either `name` or `required` argument of `#[attr]` \
+                     attribute is expected to be present, but is absent",
+                ),
+                "wrong err:\n{}",
+                err,
+            );
+        }
+    }
+
     mod required_fallback {
         use synthez::{field, Required};
 

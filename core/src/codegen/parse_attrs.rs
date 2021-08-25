@@ -1,6 +1,6 @@
 //! `#[derive(ParseAttrs)]` proc macro implementation.
 
-use std::{collections::HashSet, convert::TryFrom, iter};
+use std::{collections::BTreeSet, convert::TryFrom, iter};
 
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens};
@@ -414,12 +414,12 @@ struct FieldAttrs {
     /// Names of [`syn::Attribute`]'s arguments to use for parsing __instead
     /// of__ the [`ParseAttrs`]'s field's [`syn::Ident`].
     // #[parse(value, alias = arg)]
-    args: HashSet<syn::Ident>,
+    args: BTreeSet<syn::Ident>,
 
     /// Names of [`syn::Attribute`]'s arguments to use for parsing __along
     /// with__ the [`ParseAttrs`]'s field's [`syn::Ident`].
     // #[parse(value, alias = alias)]
-    aliases: HashSet<syn::Ident>,
+    aliases: BTreeSet<syn::Ident>,
 
     /// [`dedup`]lication strategy of how multiple values of the
     /// [`ParseAttrs`]'s field should be merged.
