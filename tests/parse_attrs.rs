@@ -643,6 +643,22 @@ mod value {
         }
 
         #[test]
+        fn allows_alias() {
+            let input: syn::DeriveInput = syn::parse_quote! {
+                #[attr(required = tirith)]
+                struct Dummy;
+            };
+
+            let res = Attr::parse_attrs("attr", &input);
+            assert!(res.is_ok(), "failed: {}", res.unwrap_err());
+
+            assert_eq!(
+                *res.unwrap().name,
+                syn::Ident::new_on_call_site("tirith"),
+            );
+        }
+
+        #[test]
         fn forbids_absent() {
             let input: syn::DeriveInput = syn::parse_quote! {
                 struct Dummy;

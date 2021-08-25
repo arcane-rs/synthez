@@ -6,7 +6,6 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-
 ## [0.1.2] · ???
 [0.1.2]: /../../tree/v0.1.2
 
@@ -17,6 +16,7 @@ All user visible changes to this project will be documented in this file. This p
 - Non-deterministic error messages. ([#2])
 
 [#2]: /../../pull/2
+
 
 
 
