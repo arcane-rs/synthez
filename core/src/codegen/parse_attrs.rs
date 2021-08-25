@@ -300,12 +300,16 @@ impl TryFrom<syn::Field> for Field {
         };
         names.try_merge_self::<kind::Value, dedup::Unique>(attrs.aliases)?;
 
+        let mut names =
+            names.into_iter().map(|n| n.to_string()).collect::<Vec<String>>();
+        names.sort();
+
         Ok(Self {
             ident,
             ty: field.ty,
             kind: **attrs.kind,
             dedup: attrs.dedup.as_deref().copied().unwrap_or_default(),
-            names: names.into_iter().map(|n| n.to_string()).collect(),
+            names,
             validators: attrs.validators,
             fallbacks: attrs.fallbacks,
         })
