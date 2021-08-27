@@ -242,14 +242,15 @@ impl<T> Required<T> {
     /// [`Container`].
     #[inline]
     #[must_use]
-    pub fn is_present(&self) -> bool {
+    pub(crate) fn is_present(&self) -> bool {
         self.0.is_some()
     }
 
     /// Replaces the underlying `value` with the given one in this [`Required`]
     /// [`Container`], returning the previous one, if any.
     #[inline]
-    pub fn replace(&mut self, value: T) -> Option<T> {
+    #[must_use]
+    pub(crate) fn replace(&mut self, value: T) -> Option<T> {
         self.0.replace(value)
     }
 
@@ -259,6 +260,18 @@ impl<T> Required<T> {
     #[must_use]
     pub(crate) fn take(&mut self) -> Option<T> {
         self.0.take()
+    }
+
+    /// Unwraps this [`Required`] [`Container`] returning the underlying value.
+    ///
+    /// # Panics
+    ///
+    /// If this [`Container`] hasn't been initialized properly, so contains no
+    /// value.
+    #[inline]
+    #[must_use]
+    pub fn into_inner(self) -> T {
+        self.0.unwrap()
     }
 }
 
