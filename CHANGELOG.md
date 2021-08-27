@@ -13,13 +13,13 @@ All user visible changes to this project will be documented in this file. This p
 
 ### Added
 
-- `Required::into_inner()` method for unwrapping this container. ([commit])
+- `Required::into_inner()` method for unwrapping this container. ([6fbda59c])
 
 ### Fixed
 
-- Unintentionally exposed `Required::is_present()` and `Required::replace()` methods. ([commit])
+- Unintentionally exposed `Required::is_present()` and `Required::replace()` methods. ([6fbda59c])
 
-[commit]: /../../commit/2
+[6fbda59c]: /../../commit/6fbda59c5940effd32e66592602007dece082fcc
 
 
 

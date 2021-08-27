@@ -1,6 +1,6 @@
 [package]
 name = "synthez-core"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2018"
 resolver = "2"
 description = "Internal implementations of synthez crate"
