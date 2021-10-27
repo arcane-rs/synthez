@@ -6,18 +6,20 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.2.0] · 2021-10-??
+## [0.2.0] · 2021-10-27
 [0.2.0]: /../../tree/v0.2.0
 
 [Diff](/../../compare/v0.1.3...v0.2.0)
 
 ### BC Breaks
 
-- Set MSRV to [1.56.0](https://blog.rust-lang.org/2021/10/21/Rust-1.56.0.html).
+- Set MSRV to [1.56.0](https://blog.rust-lang.org/2021/10/21/Rust-1.56.0.html). ([3e6d0846])
 
 ### Fixed
 
-- Broken links to [`syn`] declarations in Rust documentation.
+- Broken links to [`syn`] declarations in Rust documentation. ([3e6d0846])
+
+[3e6d0846]: /../../commit/3e6d08464ef66b1e3ca47a0afda1175e6ce15a95
 
 
 
