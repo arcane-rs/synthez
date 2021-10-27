@@ -50,8 +50,8 @@ pub fn derive(input: &syn::DeriveInput) -> syn::Result<TokenStream> {
 
     Ok(quote! {
         #[automatically_derived]
-        impl#impl_generics ::synthez::quote::ToTokens for #ty#ty_generics
-            #where_clause
+        impl #impl_generics ::synthez::quote::ToTokens for #ty #ty_generics
+             #where_clause
         {
             fn to_tokens(
                 &self,

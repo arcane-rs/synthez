@@ -6,7 +6,6 @@ use crate::spanned::IntoSpan;
 /// given [`Span`].
 ///
 /// [`Span`]: proc_macro2::Span
-#[inline]
 #[must_use]
 pub fn dup_attr_arg<S: IntoSpan>(span: S) -> syn::Error {
     syn::Error::new(span.into_span(), "duplicated attribute's argument found")
@@ -28,7 +27,6 @@ pub fn unknown_attr_arg<S: IntoSpan>(span: S, name: &str) -> syn::Error {
 /// [`Span`].
 ///
 /// [`Span`]: proc_macro2::Span
-#[inline]
 #[must_use]
 pub fn expected_followed_by_comma<S: IntoSpan>(span: S) -> syn::Error {
     syn::Error::new(span.into_span(), "expected followed by `,`")

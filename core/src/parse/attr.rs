@@ -57,7 +57,6 @@ pub fn doc_string(
 /// - If `#[doc]` doesn't contain text.
 ///
 /// [`syn::LitStr`]: struct@syn::LitStr
-#[inline]
 pub fn doc(attrs: &[syn::Attribute]) -> syn::Result<Option<syn::LitStr>> {
     doc_string(attrs).map(|opt| opt.map(Into::into))
 }

@@ -47,14 +47,14 @@ pub struct Spanning<T: ?Sized> {
 impl<T> Spanning<T> {
     /// Creates a new [`Spanning`] `item` out of the given value and its
     /// [`Span`].
-    #[inline]
     #[must_use]
     pub fn new<S: IntoSpan>(item: T, span: S) -> Self {
         Self { span: span.into_span(), item }
     }
 
     /// Destructures this [`Spanning`] wrapper returning the underlying value.
-    #[inline]
+    // false positive: constant functions cannot evaluate destructors
+    #[allow(clippy::missing_const_for_fn)]
     #[must_use]
     pub fn into_inner(self) -> T {
         self.item
@@ -64,14 +64,12 @@ impl<T> Spanning<T> {
 impl<T: ?Sized> Deref for Spanning<T> {
     type Target = T;
 
-    #[inline]
     fn deref(&self) -> &Self::Target {
         &self.item
     }
 }
 
 impl<T: ?Sized> DerefMut for Spanning<T> {
-    #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.item
     }
@@ -82,7 +80,6 @@ where
     T: PartialEq<V> + ?Sized,
     V: ?Sized,
 {
-    #[inline]
     fn eq(&self, other: &Spanning<V>) -> bool {
         self.item.eq(&other.item)
     }
@@ -98,14 +95,12 @@ impl<T: ?Sized> Spanned for Spanning<T> {
 }
 
 impl From<Spanning<&str>> for syn::LitStr {
-    #[inline]
     fn from(s: Spanning<&str>) -> Self {
         Self::new(s.item, s.span)
     }
 }
 
 impl From<Spanning<String>> for syn::LitStr {
-    #[inline]
     fn from(s: Spanning<String>) -> Self {
         Self::new(&s.item, s.span)
     }

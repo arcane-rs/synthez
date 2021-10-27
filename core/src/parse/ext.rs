@@ -4,6 +4,7 @@
 
 use std::{any::TypeId, iter};
 
+use proc_macro2::Span;
 use sealed::sealed;
 use syn::{
     parse::Parse,
@@ -54,7 +55,6 @@ pub trait ParseBuffer {
     /// If [`syn::Ident`] fails to be parsed.
     ///
     /// [`syn::Ident`]: struct@syn::Ident
-    #[inline]
     fn skip_any_ident(&self) -> syn::Result<()> {
         self.parse_any_ident().map(drop)
     }
@@ -72,7 +72,7 @@ pub trait ParseBuffer {
     ) -> syn::Result<Punctuated<T, P>>
     where
         T: Parse,
-        W: Default + Token + 'static,
+        W: Default + Token + AcceptedWrapper + 'static,
         P: Default + Parse + Token;
 
     /// Checks whether the next [`Token`] is a wrapper `W` and if yes, then
@@ -90,7 +90,7 @@ pub trait ParseBuffer {
     ) -> syn::Result<Punctuated<T, P>>
     where
         T: Parse,
-        W: Default + Token + 'static,
+        W: Default + Token + AcceptedWrapper + 'static,
         P: Default + Parse + Token;
 
     /// Checks whether the next [`Token`] is a wrapper `W` and if yes, then
@@ -110,23 +110,20 @@ pub trait ParseBuffer {
     ) -> syn::Result<Punctuated<T, P>>
     where
         T: Parse,
-        W: Default + Token + 'static,
+        W: Default + Token + AcceptedWrapper + 'static,
         P: Default + Parse + Token;
 }
 
 #[sealed]
 impl<'buf> ParseBuffer for syn::parse::ParseBuffer<'buf> {
-    #[inline]
     fn try_parse<T: Default + Parse + Token>(&self) -> syn::Result<Option<T>> {
         self.is_next::<T>().then(|| self.parse()).transpose()
     }
 
-    #[inline]
     fn is_next<T: Default + Token>(&self) -> bool {
         self.lookahead1().peek(|_| T::default())
     }
 
-    #[inline]
     fn parse_any_ident(&self) -> syn::Result<syn::Ident> {
         <syn::Ident as syn::ext::IdentExt>::parse_any(self)
     }
@@ -136,7 +133,7 @@ impl<'buf> ParseBuffer for syn::parse::ParseBuffer<'buf> {
     ) -> syn::Result<Punctuated<T, P>>
     where
         T: Parse,
-        W: Default + Token + 'static,
+        W: Default + Token + AcceptedWrapper + 'static,
         P: Default + Parse + Token,
     {
         let inner;
@@ -147,10 +144,11 @@ impl<'buf> ParseBuffer for syn::parse::ParseBuffer<'buf> {
         } else if TypeId::of::<W>() == TypeId::of::<token::Paren>() {
             let _ = syn::parenthesized!(inner in self);
         } else {
-            unimplemented!(
-                "ParseBufferExt::parse_wrapped_and_punctuated supports only \
+            return Err(syn::Error::new(
+                Span::call_site(),
+                "`ParseBufferExt::parse_wrapped_and_punctuated` supports only \
                  brackets, braces and parentheses as wrappers.",
-            );
+            ));
         }
         Punctuated::parse_terminated(&inner)
     }
@@ -160,7 +158,7 @@ impl<'buf> ParseBuffer for syn::parse::ParseBuffer<'buf> {
     ) -> syn::Result<Punctuated<T, P>>
     where
         T: Parse,
-        W: Default + Token + 'static,
+        W: Default + Token + AcceptedWrapper + 'static,
         P: Default + Parse + Token,
     {
         Ok(if self.is_next::<W>() {
@@ -175,7 +173,7 @@ impl<'buf> ParseBuffer for syn::parse::ParseBuffer<'buf> {
     ) -> syn::Result<Punctuated<T, P>>
     where
         T: Parse,
-        W: Default + Token + 'static,
+        W: Default + Token + AcceptedWrapper + 'static,
         P: Default + Parse + Token,
     {
         Ok(if self.is_next::<W>() {
@@ -186,3 +184,19 @@ impl<'buf> ParseBuffer for syn::parse::ParseBuffer<'buf> {
         })
     }
 }
+
+/// Trait marking [`Token`] types accepted by
+/// [`parse_wrapped_and_punctuated()`][0] method (and similar) as a wrapper.
+///
+/// [0]: ParseBuffer::parse_wrapped_and_punctuated
+#[sealed]
+pub trait AcceptedWrapper {}
+
+#[sealed]
+impl AcceptedWrapper for token::Bracket {}
+
+#[sealed]
+impl AcceptedWrapper for token::Brace {}
+
+#[sealed]
+impl AcceptedWrapper for token::Paren {}

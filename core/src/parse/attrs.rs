@@ -76,22 +76,18 @@ pub trait Attrs: Default + Parse {
 }
 
 impl<V: Attrs + Default + Parse> Attrs for Box<V> {
-    #[inline]
     fn try_merge(self, another: Self) -> syn::Result<Self> {
         (*self).try_merge(*another).map(Self::new)
     }
 
-    #[inline]
     fn validate(&self, attr_name: &str, item_span: Span) -> syn::Result<()> {
         (&**self).validate(attr_name, item_span)
     }
 
-    #[inline]
     fn fallback(&mut self, attrs: &[syn::Attribute]) -> syn::Result<()> {
         (&mut **self).fallback(attrs)
     }
 
-    #[inline]
     fn parse_attrs<T>(name: &str, item: &T) -> syn::Result<Self>
     where
         T: has::Attrs + Spanned,
@@ -102,7 +98,6 @@ impl<V: Attrs + Default + Parse> Attrs for Box<V> {
 
 /// Filters the given `attrs` to contain [`syn::Attribute`]s only with the given
 /// `name`.
-#[inline]
 pub fn filter_by_name<'n: 'ret, 'a: 'ret, 'ret>(
     name: &'n str,
     attrs: &'a [syn::Attribute],
@@ -111,7 +106,6 @@ pub fn filter_by_name<'n: 'ret, 'a: 'ret, 'ret>(
 }
 
 /// Compares the given `path` with the one-segment string `value` to be equal.
-#[inline]
 #[must_use]
 fn path_eq_single(path: &syn::Path, value: &str) -> bool {
     path.segments.len() == 1 && path.segments[0].ident == value
@@ -774,7 +768,6 @@ pub mod field {
 
     #[sealed]
     impl<T: ?Sized, V> TryMerge<V> for T {
-        #[inline]
         fn try_merge<K, D>(&mut self, val: V) -> syn::Result<()>
         where
             Self: TryApply<V, K, D>,
@@ -784,7 +777,6 @@ pub mod field {
             <Self as TryApply<V, K, D>>::try_apply(self, val)
         }
 
-        #[inline]
         fn try_merge_self<K, D>(&mut self, another: Self) -> syn::Result<()>
         where
             Self: TryApplySelf<V, K, D> + Sized,
@@ -958,10 +950,11 @@ pub mod validate {
     }
 
     mod option {
+        //! Implementations of [`Validation`] for [`Option`].
+
         use super::{rule, Validation};
 
         impl<V> Validation<rule::Provided> for Option<V> {
-            #[inline]
             fn validation(&self) -> syn::Result<()> {
                 Ok(())
             }
@@ -969,6 +962,8 @@ pub mod validate {
     }
 
     mod required {
+        //! Implementations of [`Validation`] for [`Required`].
+
         use proc_macro2::Span;
 
         use crate::Required;
@@ -976,7 +971,6 @@ pub mod validate {
         use super::{rule, Validation};
 
         impl<V> Validation<rule::Provided> for Required<V> {
-            #[inline]
             fn validation(&self) -> syn::Result<()> {
                 self.is_present().then(|| ()).ok_or_else(|| {
                     syn::Error::new(
@@ -989,10 +983,11 @@ pub mod validate {
     }
 
     mod vec {
+        //! Implementations of [`Validation`] for [`Vec`].
+
         use super::{rule, Validation};
 
         impl<V> Validation<rule::Provided> for Vec<V> {
-            #[inline]
             fn validation(&self) -> syn::Result<()> {
                 Ok(())
             }
@@ -1000,6 +995,8 @@ pub mod validate {
     }
 
     mod hashset {
+        //! Implementations of [`Validation`] for [`HashSet`].
+
         use std::{
             collections::HashSet,
             hash::{BuildHasher, Hash},
@@ -1012,7 +1009,6 @@ pub mod validate {
             V: Eq + Hash,
             S: BuildHasher,
         {
-            #[inline]
             fn validation(&self) -> syn::Result<()> {
                 Ok(())
             }
@@ -1020,12 +1016,13 @@ pub mod validate {
     }
 
     mod btreeset {
+        //! Implementations of [`Validation`] for [`BTreeSet`].
+
         use std::collections::BTreeSet;
 
         use super::{rule, Validation};
 
         impl<V: Ord> Validation<rule::Provided> for BTreeSet<V> {
-            #[inline]
             fn validation(&self) -> syn::Result<()> {
                 Ok(())
             }
@@ -1033,6 +1030,8 @@ pub mod validate {
     }
 
     mod hashmap {
+        //! Implementations of [`Validation`] for [`HashMap`].
+
         use std::{
             collections::HashMap,
             hash::{BuildHasher, Hash},
@@ -1045,7 +1044,6 @@ pub mod validate {
             K: Eq + Hash,
             S: BuildHasher,
         {
-            #[inline]
             fn validation(&self) -> syn::Result<()> {
                 Ok(())
             }
@@ -1053,12 +1051,13 @@ pub mod validate {
     }
 
     mod btreemap {
+        //! Implementations of [`Validation`] for [`BTreeMap`].
+
         use std::collections::BTreeMap;
 
         use super::{rule, Validation};
 
         impl<K: Ord, V> Validation<rule::Provided> for BTreeMap<K, V> {
-            #[inline]
             fn validation(&self) -> syn::Result<()> {
                 Ok(())
             }
@@ -1081,7 +1080,6 @@ pub mod validate {
 
     #[sealed]
     impl<T: ?Sized> Validate for T {
-        #[inline]
         fn validate<R: Rule + ?Sized>(&self) -> syn::Result<()>
         where
             Self: Validation<R>,

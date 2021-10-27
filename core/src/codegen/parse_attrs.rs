@@ -1,12 +1,13 @@
 //! `#[derive(ParseAttrs)]` proc macro implementation.
 
-use std::{collections::BTreeSet, convert::TryFrom, iter};
+use std::{collections::BTreeSet, iter};
 
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens};
 use syn::{
     ext::IdentExt as _,
     parse::{Parse, ParseStream},
+    spanned::Spanned as _,
     token,
 };
 
@@ -69,12 +70,14 @@ pub fn derive(input: syn::DeriveInput) -> syn::Result<TokenStream> {
 #[derive(Debug)]
 struct Definition {
     /// [`syn::Ident`] of this structure's type.
+    ///
+    /// [`syn::Ident`]: struct@syn::Ident
     ty: syn::Ident,
 
     /// [`syn::Generics`] of this structure's type.
     generics: syn::Generics,
 
-    /// [`Fields`] of this structure to generate code for.
+    /// [`Field`]s of this structure to generate code for.
     fields: Vec<Field>,
 }
 
@@ -152,13 +155,14 @@ impl Definition {
 
         quote! {
             #[automatically_derived]
-            impl#impl_generics ::synthez::syn::parse::Parse for #ty#ty_generics
-                #where_clause
+            impl #impl_generics ::synthez::syn::parse::Parse
+             for #ty #ty_generics
+                 #where_clause
             {
                 fn parse(
                     input: ::synthez::syn::parse::ParseStream<'_>,
                 ) -> ::synthez::syn::Result<Self> {
-                    let mut out = <#ty#ty_generics as Default>::default();
+                    let mut out = <#ty #ty_generics as Default>::default();
                     while !input.is_empty() {
                         let ident =
                             ::synthez::ParseBufferExt::parse_any_ident(
@@ -219,8 +223,8 @@ impl Definition {
 
         quote! {
             #[automatically_derived]
-            impl#impl_generics ::synthez::parse::Attrs for #ty#ty_generics
-                #where_clause
+            impl #impl_generics ::synthez::parse::Attrs for #ty #ty_generics
+                 #where_clause
             {
                 fn try_merge(
                     mut self,
@@ -259,6 +263,8 @@ impl Definition {
 struct Field {
     /// [`syn::Ident`] of this [`Field`] in the original code (without possible
     /// `r#` part).
+    ///
+    /// [`syn::Ident`]: struct@syn::Ident
     ident: syn::Ident,
 
     /// [`syn::Type`] of this [`Field`] (with [`field::Container`]).
@@ -291,7 +297,11 @@ impl TryFrom<syn::Field> for Field {
 
     fn try_from(field: syn::Field) -> syn::Result<Self> {
         let attrs = FieldAttrs::parse_attrs(ATTR_NAME, &field)?;
-        let ident = field.ident.unwrap();
+
+        let field_span = field.span();
+        let ident = field.ident.ok_or_else(move || {
+            syn::Error::new(field_span, "Named field expected")
+        })?;
 
         let mut names = if attrs.args.is_empty() {
             iter::once(ident.unraw()).collect()
@@ -334,14 +344,15 @@ impl Field {
         let field = &self.ident;
         let ty = &self.ty;
 
-        let arg_names = if self.names.len() > 1 {
+        let names_len = self.names.len();
+        let arg_names = if names_len > 1 {
             format!(
                 "either `{}` or `{}`",
-                &self.names[..(self.names.len() - 1)].join("`, `"),
-                self.names.last().unwrap(),
+                self.names[..(names_len - 1)].join("`, `"),
+                self.names[names_len - 1],
             )
         } else {
-            format!("`{}`", self.names.first().unwrap())
+            format!("`{}`", self.names[0])
         };
         let err_msg =
             format!("{} argument of `#[{{}}]` attribute {{}}", arg_names);
@@ -367,7 +378,7 @@ impl Field {
         }
 
         let field = &self.ident;
-        let attr_fmt = format!("{{}}({})", self.names.first().unwrap());
+        let attr_fmt = format!("{{}}({})", self.names[0]);
 
         Some(quote! {
             for v in &self.#field {
@@ -413,11 +424,15 @@ struct FieldAttrs {
 
     /// Names of [`syn::Attribute`]'s arguments to use for parsing __instead
     /// of__ the [`ParseAttrs`]'s field's [`syn::Ident`].
+    ///
+    /// [`syn::Ident`]: struct@syn::Ident
     // #[parse(value, alias = arg)]
     args: BTreeSet<syn::Ident>,
 
     /// Names of [`syn::Attribute`]'s arguments to use for parsing __along
     /// with__ the [`ParseAttrs`]'s field's [`syn::Ident`].
+    ///
+    /// [`syn::Ident`]: struct@syn::Ident
     // #[parse(value, alias = alias)]
     aliases: BTreeSet<syn::Ident>,
 
@@ -540,6 +555,8 @@ impl ParseAttrs for FieldAttrs {
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Kind {
     /// Field is parsed as a simple [`syn::Ident`].
+    ///
+    /// [`syn::Ident`]: struct@syn::Ident
     Ident,
 
     /// Field is parsed as a nested structure implementing [`ParseAttrs`].
@@ -549,9 +566,13 @@ enum Kind {
     ///
     /// Boolean refers to whether the value and the [`syn::Ident`] are separated
     /// with spaces only.
+    ///
+    /// [`syn::Ident`]: struct@syn::Ident
     Value(bool),
 
     /// Field is parsed as as key-value pairs behind a [`syn::Ident`].
+    ///
+    /// [`syn::Ident`]: struct@syn::Ident
     Map,
 }
 
@@ -621,7 +642,6 @@ enum Dedup {
 }
 
 impl Default for Dedup {
-    #[inline]
     fn default() -> Self {
         Self::Unique
     }

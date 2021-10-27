@@ -1,9 +1,9 @@
 [package]
 name = "synthez-codegen"
-version = "0.1.3"
-edition = "2018"
-resolver = "2"
-description = "Internal codegen shim of synthez crate"
+version = "0.2.0"
+edition = "2021"
+rust-version = "1.56"
+description = "Internal codegen shim of `synthez` crate."
 authors = ["Kai Ren <tyranron@gmail.com>"]
 license = "BlueOak-1.0.0"
 documentation = "https://docs.rs/synthez-codegen"
@@ -17,19 +17,10 @@ include = ["/src/", "/Cargo.toml", "/README.md"]
 proc-macro = true
 
 [dependencies]
-synthez-core = { version = "0.1.3", path = "../core" }
-[dependencies.proc-macro2]
-    version = "1.0.4"
-    default-features = false
-    features = ["proc-macro"]
-[dependencies.syn]
-    version = "1.0.72"
-    default-features = false
-    features = ["parsing", "proc-macro"]
+syn = { version = "1.0.72", features = ["parsing", "proc-macro"], default-features = false }
+synthez-core = { version = "0.2", path = "../core" }
 
 [dev-dependencies]
+proc-macro2 = { version = "1.0.4", default-features = false }
+syn = { version = "1.0.72", features = ["derive", "parsing", "proc-macro"], default-features = false }
 synthez = { path = "..", features = ["full"] }
-[dev-dependencies.syn]
-    version = "1.0.72"
-    default-features = false
-    features = ["derive", "parsing", "proc-macro"]

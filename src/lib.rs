@@ -1,171 +1,7 @@
-//! Steroids for [`syn`], [`quote`] and [`proc_macro2`] crates.
-//!
-//! # Cargo features
-//!
-//! ### `full`
-//!
-//! Same as `full` feature of [`syn`] crate.
-//!
-//! Enables support of data structures for representing the syntax tree of all
-//! valid Rust source code, including items and expressions.
-//!
-//! # Example of writing `proc_macro_derive`
-//!
-//! This is an example of how this library can be used to write a simplified
-//! `proc_macro_derive` implemention for deriving [`From`] implementations.
-//!
-//! ```rust
-//! # use std::{collections::HashMap, convert::TryFrom};
-//! #
-//! # use synthez::{proc_macro2::{Span, TokenStream}, quote::quote, syn};
-//! use synthez::{DataExt as _, ParseAttrs, ToTokens};
-//!
-//! pub fn derive(input: syn::DeriveInput) -> syn::Result<TokenStream> {
-//!     let attrs = Attrs::parse_attrs("from", &input)?;
-//!     match (attrs.forward.is_some(), !attrs.custom.is_empty()) {
-//!         (true, true) => Err(syn::Error::new_spanned(
-//!             input,
-//!             "`forward` and `on` arguments are mutually exclusive",
-//!         )),
-//!         (false, false) => Err(syn::Error::new_spanned(
-//!             input,
-//!             "either `forward` or `on` argument is expected",
-//!         )),
-//!
-//!         // #[from(forward)]
-//!         (true, _) => {
-//!             if !matches!(&input.data, syn::Data::Struct(_)) {
-//!                 return Err(syn::Error::new_spanned(
-//!                     input,
-//!                     "only tuple structs can forward-derive From",
-//!                 ));
-//!             }
-//!             let fields = input.data.unnamed_fields()?;
-//!             if fields.len() > 1 {
-//!                 return Err(syn::Error::new_spanned(
-//!                     fields,
-//!                     "only single-field tuple structs can forward-derive \
-//!                      From",
-//!                 ));
-//!             }
-//!             let definition = ForwardDefinition {
-//!                 ty: input.ident,
-//!                 inner_ty: fields.into_iter().last().unwrap().ty,
-//!             };
-//!             Ok(quote! {
-//!                 #definition
-//!             })
-//!         }
-//!
-//!         // #[from(on <type> = <func>)]
-//!         (_, true) => {
-//!             let definitions =
-//!                 CustomDefinitions { ty: input.ident, funcs: attrs.custom };
-//!             Ok(quote! {
-//!                 #definitions
-//!             })
-//!         }
-//!     }
-//! }
-//!
-//! #[derive(Default, ParseAttrs)]
-//! struct Attrs {
-//!     #[parse(ident)]
-//!     forward: Option<syn::Ident>,
-//!     #[parse(map, arg = on)]
-//!     custom: HashMap<syn::Type, syn::Expr>,
-//! }
-//!
-//! #[derive(ToTokens)]
-//! #[to_tokens(append(impl_from))]
-//! struct ForwardDefinition {
-//!     ty: syn::Ident,
-//!     inner_ty: syn::Type,
-//! }
-//!
-//! impl ForwardDefinition {
-//!     fn impl_from(&self) -> TokenStream {
-//!         let (ty, inner_ty) = (&self.ty, &self.inner_ty);
-//!         quote! {
-//!             impl<T> From<T> for #ty where #inner_ty: From<T> {
-//!                 fn from(v: T) -> Self {
-//!                     Self(v.into())
-//!                 }
-//!             }
-//!         }
-//!     }
-//! }
-//!
-//! #[derive(ToTokens)]
-//! #[to_tokens(append(impl_froms))]
-//! struct CustomDefinitions {
-//!     ty: syn::Ident,
-//!     funcs: HashMap<syn::Type, syn::Expr>,
-//! }
-//!
-//! impl CustomDefinitions {
-//!     fn impl_froms(&self) -> TokenStream {
-//!         let ty = &self.ty;
-//!         // We sort here for tests below not failing due to undetermined
-//!         // order only. Real implementation may omit this.
-//!         let mut sorted = self.funcs.iter().collect::<Vec<_>>();
-//!         sorted.sort_unstable_by(|(ty1, _), (ty2, _)| {
-//!             quote!(#ty1).to_string().cmp(&quote!(#ty2).to_string())
-//!         });
-//!         let impls = sorted.into_iter().map(move |(from_ty, func)| {
-//!             quote! {
-//!                 impl From<#from_ty> for #ty {
-//!                     fn from(v: #from_ty) -> Self {
-//!                         #func(v)
-//!                     }
-//!                 }
-//!             }
-//!         });
-//!         quote! { #( #impls )* }
-//!     }
-//! }
-//!
-//! # fn main() {
-//! let input = syn::parse_quote! {
-//!     #[derive(From)]
-//!     #[from(forward)]
-//!     struct Id(u64);
-//! };
-//! let output = quote! {
-//!     impl<T> From<T> for Id where u64: From<T> {
-//!         fn from(v: T) -> Self {
-//!             Self(v.into())
-//!         }
-//!     }
-//! };
-//! assert_eq!(derive(input).unwrap().to_string(), output.to_string());
-//!
-//! let input = syn::parse_quote! {
-//!     #[derive(From)]
-//!     #[from(on bool = Self::parse_bool)]
-//!     #[from(on u8 = from_u8_to_maybe)]
-//!     enum Maybe {
-//!         Yes,
-//!         No,
-//!     }
-//! };
-//! let output = quote! {
-//!     impl From<bool> for Maybe {
-//!         fn from(v: bool) -> Self {
-//!             Self::parse_bool(v)
-//!         }
-//!     }
-//!     impl From<u8> for Maybe {
-//!         fn from(v: u8) -> Self {
-//!             from_u8_to_maybe(v)
-//!         }
-//!     }
-//! };
-//! assert_eq!(derive(input).unwrap().to_string(), output.to_string());
-//! # }
-//! ```
-
+#![cfg_attr(docsrs, feature(doc_cfg))]
+#![doc = include_str!("../README.md")]
 #![deny(
+    macro_use_extern_crate,
     nonstandard_style,
     rust_2018_idioms,
     rustdoc::broken_intra_doc_links,
@@ -175,17 +11,82 @@
 )]
 #![forbid(non_ascii_idents, unsafe_code)]
 #![warn(
-    deprecated_in_future,
+    clippy::as_conversions,
+    clippy::branches_sharing_code,
+    clippy::clone_on_ref_ptr,
+    clippy::create_dir,
+    clippy::dbg_macro,
+    clippy::debug_assert_with_mut_call,
+    clippy::decimal_literal_representation,
+    clippy::else_if_without_else,
+    clippy::empty_line_after_outer_attr,
+    clippy::exit,
+    clippy::expect_used,
+    clippy::fallible_impl_from,
+    clippy::filetype_is_file,
+    clippy::float_cmp_const,
+    clippy::fn_to_numeric_cast,
+    clippy::get_unwrap,
+    clippy::if_then_some_else_none,
+    clippy::imprecise_flops,
+    clippy::let_underscore_must_use,
+    clippy::lossy_float_literal,
+    clippy::map_err_ignore,
+    clippy::mem_forget,
+    clippy::missing_const_for_fn,
+    clippy::missing_docs_in_private_items,
+    clippy::multiple_inherent_impl,
+    clippy::mutex_integer,
+    clippy::nonstandard_macro_braces,
+    clippy::option_if_let_else,
+    clippy::panic_in_result_fn,
+    clippy::pedantic,
+    clippy::print_stderr,
+    clippy::print_stdout,
+    clippy::rc_buffer,
+    clippy::rc_mutex,
+    clippy::rest_pat_in_fully_bound_structs,
+    clippy::shadow_unrelated,
+    clippy::str_to_string,
+    clippy::string_add,
+    clippy::string_lit_as_bytes,
+    clippy::string_to_string,
+    clippy::suboptimal_flops,
+    clippy::suspicious_operation_groupings,
+    clippy::todo,
+    clippy::trivial_regex,
+    clippy::unimplemented,
+    clippy::unnecessary_self_imports,
+    clippy::unneeded_field_pattern,
+    clippy::unwrap_in_result,
+    clippy::unwrap_used,
+    clippy::use_debug,
+    clippy::use_self,
+    clippy::useless_let_if_seq,
+    clippy::verbose_file_reads,
+    clippy::wildcard_enum_match_arm,
+    future_incompatible,
+    meta_variable_misuse,
     missing_copy_implementations,
     missing_debug_implementations,
     missing_docs,
+    noop_method_call,
+    semicolon_in_expressions_from_macros,
     unreachable_pub,
+    unused_crate_dependencies,
+    unused_extern_crates,
     unused_import_braces,
     unused_labels,
     unused_lifetimes,
     unused_qualifications,
-    unused_results
+    unused_results,
+    variant_size_differences
 )]
+
+// For correct Rust docs rendering only!
+// TODO: Remove once docs render correctly without it.
+#[allow(unused_imports)]
+use syn as _;
 
 #[doc(inline)]
 pub use synthez_codegen::ToTokens;

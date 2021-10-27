@@ -27,7 +27,6 @@ use std::{
 ///     description: Option<syn::LitStr>,
 /// }
 /// ```
-#[inline]
 pub fn if_empty<V, C, Parser, Input>(
     parse: Parser,
 ) -> impl FnOnce(&mut C, Input) -> syn::Result<()>
@@ -64,7 +63,6 @@ pub trait Container<V> {
 
     /// Sets the provided `value` into this  [`Container`], dropping the
     /// previous one, if any.
-    #[inline]
     fn set(&mut self, value: V) {
         drop(self.replace(value));
     }
@@ -73,18 +71,15 @@ pub trait Container<V> {
 impl<V> Container<V> for Option<V> {
     type Value = V;
 
-    #[must_use]
     fn is_empty(&self) -> bool {
         self.is_none()
     }
 
-    #[inline]
     fn has(&self, _: &V) -> bool {
         self.is_some()
     }
 
-    #[inline]
-    fn replace(&mut self, val: V) -> Option<V> {
+    fn replace(&mut self, val: V) -> Self {
         Self::replace(self, val)
     }
 }
@@ -92,17 +87,14 @@ impl<V> Container<V> for Option<V> {
 impl<V> Container<V> for Required<V> {
     type Value = V;
 
-    #[must_use]
     fn is_empty(&self) -> bool {
         !self.is_present()
     }
 
-    #[inline]
     fn has(&self, _: &V) -> bool {
         self.is_present()
     }
 
-    #[inline]
     fn replace(&mut self, val: V) -> Option<V> {
         Self::replace(self, val)
     }
@@ -111,18 +103,16 @@ impl<V> Container<V> for Required<V> {
 impl<V: PartialEq> Container<V> for Vec<V> {
     type Value = V;
 
-    #[must_use]
     fn is_empty(&self) -> bool {
         Self::is_empty(self)
     }
 
-    #[inline]
     fn has(&self, val: &V) -> bool {
         self.contains(val)
     }
 
     fn replace(&mut self, val: V) -> Option<V> {
-        #[allow(clippy::option_if_let_else)]
+        #[allow(clippy::option_if_let_else)] // false positive: moving `val`
         if let Some(old) = self.iter_mut().find(|v| *v == &val) {
             Some(mem::replace(old, val))
         } else {
@@ -139,17 +129,14 @@ where
 {
     type Value = V;
 
-    #[must_use]
     fn is_empty(&self) -> bool {
         Self::is_empty(self)
     }
 
-    #[inline]
     fn has(&self, val: &V) -> bool {
         self.contains(val)
     }
 
-    #[inline]
     fn replace(&mut self, val: V) -> Option<V> {
         Self::replace(self, val)
     }
@@ -158,17 +145,14 @@ where
 impl<V: Ord> Container<V> for BTreeSet<V> {
     type Value = V;
 
-    #[must_use]
     fn is_empty(&self) -> bool {
         Self::is_empty(self)
     }
 
-    #[inline]
     fn has(&self, val: &V) -> bool {
         self.contains(val)
     }
 
-    #[inline]
     fn replace(&mut self, val: V) -> Option<V> {
         Self::replace(self, val)
     }
@@ -181,17 +165,14 @@ where
 {
     type Value = (K, V);
 
-    #[must_use]
     fn is_empty(&self) -> bool {
         Self::is_empty(self)
     }
 
-    #[inline]
     fn has(&self, val: &(K, V)) -> bool {
         self.contains_key(&val.0)
     }
 
-    #[inline]
     fn replace(&mut self, val: (K, V)) -> Option<(K, V)> {
         let prev = self.remove_entry(&val.0);
         drop(self.insert(val.0, val.1));
@@ -202,17 +183,14 @@ where
 impl<K: Ord, V> Container<(K, V)> for BTreeMap<K, V> {
     type Value = (K, V);
 
-    #[must_use]
     fn is_empty(&self) -> bool {
         Self::is_empty(self)
     }
 
-    #[inline]
     fn has(&self, val: &(K, V)) -> bool {
         self.contains_key(&val.0)
     }
 
-    #[inline]
     fn replace(&mut self, val: (K, V)) -> Option<(K, V)> {
         let prev = self.remove_entry(&val.0);
         drop(self.insert(val.0, val.1));
@@ -222,16 +200,19 @@ impl<K: Ord, V> Container<(K, V)> for BTreeMap<K, V> {
 
 /// [`Container`] requiring a field to have a value mandatory.
 ///
-/// It's similar to [`Option`] but panics directly on accessing to the
-/// underlying value, if it's not present.
+/// It's similar to an [`Option`], but panics on accessing to an absent
+/// underlying value. So, is not intended to be created directly in user code,
+/// but rather only used for marking types in struct fields, so this library
+/// machinery may kick in and take care of correct values creation without
+/// introducing any panics.
 ///
-/// Accessing the original value is intended to be done via [`Deref`] and
-/// [`DerefMut`].
+/// Accessing the underlying value, stored in this wrapper, is intended to be
+/// done via [`Deref`] and [`DerefMut`] in user code.
 #[derive(Clone, Copy, Debug)]
 pub struct Required<T>(Option<T>);
 
+#[doc(hidden)]
 impl<T> Default for Required<T> {
-    #[inline]
     fn default() -> Self {
         Self(None)
     }
@@ -240,15 +221,13 @@ impl<T> Default for Required<T> {
 impl<T> Required<T> {
     /// Indicates whether the underlying value is present in this [`Required`]
     /// [`Container`].
-    #[inline]
     #[must_use]
-    pub(crate) fn is_present(&self) -> bool {
+    pub(crate) const fn is_present(&self) -> bool {
         self.0.is_some()
     }
 
     /// Replaces the underlying `value` with the given one in this [`Required`]
     /// [`Container`], returning the previous one, if any.
-    #[inline]
     #[must_use]
     pub(crate) fn replace(&mut self, value: T) -> Option<T> {
         self.0.replace(value)
@@ -256,7 +235,6 @@ impl<T> Required<T> {
 
     /// Removes the underlying value from this [`Required`] [`Container`],
     /// returning it, if any.
-    #[inline]
     #[must_use]
     pub(crate) fn take(&mut self) -> Option<T> {
         self.0.take()
@@ -268,26 +246,26 @@ impl<T> Required<T> {
     ///
     /// If this [`Container`] hasn't been initialized properly, so contains no
     /// value.
-    #[inline]
     #[must_use]
     pub fn into_inner(self) -> T {
-        self.0.unwrap()
+        #[allow(clippy::expect_used)]
+        self.0.expect("Uninitialized `Required` value")
     }
 }
 
 impl<T> Deref for Required<T> {
     type Target = T;
 
-    #[inline]
     fn deref(&self) -> &Self::Target {
-        self.0.as_ref().unwrap()
+        #[allow(clippy::expect_used)]
+        self.0.as_ref().expect("Uninitialized `Required` value")
     }
 }
 
 impl<T> DerefMut for Required<T> {
-    #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
-        self.0.as_mut().unwrap()
+        #[allow(clippy::expect_used)]
+        self.0.as_mut().expect("Uninitialized `Required` value")
     }
 }
 
@@ -295,9 +273,8 @@ impl<T> IntoIterator for Required<T> {
     type Item = T;
     type IntoIter = iter::Once<T>;
 
-    #[inline]
     fn into_iter(self) -> Self::IntoIter {
-        iter::once(self.0.unwrap())
+        iter::once(self.into_inner())
     }
 }
 
@@ -305,9 +282,8 @@ impl<'a, T> IntoIterator for &'a Required<T> {
     type Item = &'a T;
     type IntoIter = iter::Once<&'a T>;
 
-    #[inline]
     fn into_iter(self) -> Self::IntoIter {
-        iter::once(self.0.as_ref().unwrap())
+        iter::once(&*self)
     }
 }
 
@@ -315,8 +291,7 @@ impl<'a, T> IntoIterator for &'a mut Required<T> {
     type Item = &'a mut T;
     type IntoIter = iter::Once<&'a mut T>;
 
-    #[inline]
     fn into_iter(self) -> Self::IntoIter {
-        iter::once(self.0.as_mut().unwrap())
+        iter::once(&mut *self)
     }
 }

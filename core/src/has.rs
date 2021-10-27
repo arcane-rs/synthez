@@ -8,16 +8,15 @@ pub trait Attrs {
 }
 
 impl Attrs for Vec<syn::Attribute> {
-    #[inline]
     fn attrs(&self) -> &[syn::Attribute] {
         &*self
     }
 }
 
+/// Helper macro for implementing [`Attrs`] for the given type.
 macro_rules! impl_attrs_for {
     ($( $ty:ty, )+) => {$(
         impl Attrs for $ty {
-            #[inline]
             fn attrs(&self) -> &[syn::Attribute] {
                 &*self.attrs
             }
@@ -37,11 +36,12 @@ impl_attrs_for! {
 }
 
 #[cfg(feature = "full")]
+/// Helper macro for implementing [`Attrs`] for the given type, conditioned by a
+/// `full` Cargo feature.
 macro_rules! impl_attrs_full_for {
     ($( $ty:ty, )+) => {$(
-        #[cfg_attr(docsrs, doc(cfg(feature = "full")))]
+        #[cfg(feature = "full")]
         impl Attrs for $ty {
-            #[inline]
             fn attrs(&self) -> &[syn::Attribute] {
                 &*self.attrs
             }

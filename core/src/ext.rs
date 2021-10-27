@@ -60,10 +60,12 @@ impl Data for syn::Data {
         match self {
             syn::Data::Struct(data) => match data.fields {
                 syn::Fields::Named(f) => Ok(f.named),
-                fields => Err(syn::Error::new_spanned(
-                    fields,
-                    "expected named struct fields only",
-                )),
+                fields @ (syn::Fields::Unnamed(_) | syn::Fields::Unit) => {
+                    Err(syn::Error::new_spanned(
+                        fields,
+                        "expected named struct fields only",
+                    ))
+                }
             },
             syn::Data::Enum(data) => Err(syn::Error::new_spanned(
                 data.enum_token,
@@ -82,10 +84,12 @@ impl Data for syn::Data {
         match self {
             syn::Data::Struct(data) => match &data.fields {
                 syn::Fields::Named(f) => Ok(&f.named),
-                fields => Err(syn::Error::new_spanned(
-                    fields,
-                    "expected named struct fields only",
-                )),
+                fields @ (syn::Fields::Unnamed(_) | syn::Fields::Unit) => {
+                    Err(syn::Error::new_spanned(
+                        fields,
+                        "expected named struct fields only",
+                    ))
+                }
             },
             syn::Data::Enum(data) => Err(syn::Error::new_spanned(
                 data.enum_token,
@@ -104,10 +108,12 @@ impl Data for syn::Data {
         match self {
             syn::Data::Struct(data) => match data.fields {
                 syn::Fields::Unnamed(f) => Ok(f.unnamed),
-                fields => Err(syn::Error::new_spanned(
-                    fields,
-                    "expected unnamed struct fields only",
-                )),
+                fields @ (syn::Fields::Named(_) | syn::Fields::Unit) => {
+                    Err(syn::Error::new_spanned(
+                        fields,
+                        "expected unnamed struct fields only",
+                    ))
+                }
             },
             syn::Data::Enum(data) => Err(syn::Error::new_spanned(
                 data.enum_token,
@@ -126,10 +132,12 @@ impl Data for syn::Data {
         match self {
             syn::Data::Struct(data) => match &data.fields {
                 syn::Fields::Unnamed(f) => Ok(&f.unnamed),
-                fields => Err(syn::Error::new_spanned(
-                    fields,
-                    "expected unnamed struct fields only",
-                )),
+                fields @ (syn::Fields::Named(_) | syn::Fields::Unit) => {
+                    Err(syn::Error::new_spanned(
+                        fields,
+                        "expected unnamed struct fields only",
+                    ))
+                }
             },
             syn::Data::Enum(data) => Err(syn::Error::new_spanned(
                 data.enum_token,
