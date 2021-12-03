@@ -85,10 +85,6 @@ impl Definition {
     /// Generates implementation of [`syn::parse::Parse`] trait for this struct.
     #[must_use]
     fn impl_syn_parse(&self) -> TokenStream {
-        let ty = &self.ty;
-        let (impl_generics, ty_generics, where_clause) =
-            self.generics.split_for_impl();
-
         let parse_arms = self.fields.iter().map(|f| {
             let field = &f.ident;
             let ty = &f.ty;
@@ -152,6 +148,10 @@ impl Definition {
                 #( #arg_lits )|* => { #code },
             }
         });
+
+        let ty = &self.ty;
+        let (impl_generics, ty_generics, where_clause) =
+            self.generics.split_for_impl();
 
         quote! {
             #[automatically_derived]

@@ -19,6 +19,7 @@
     clippy::decimal_literal_representation,
     clippy::else_if_without_else,
     clippy::empty_line_after_outer_attr,
+    clippy::equatable_if_let,
     clippy::exit,
     clippy::expect_used,
     clippy::fallible_impl_from,
@@ -45,6 +46,7 @@
     clippy::rc_buffer,
     clippy::rc_mutex,
     clippy::rest_pat_in_fully_bound_structs,
+    clippy::same_name_method,
     clippy::shadow_unrelated,
     clippy::str_to_string,
     clippy::string_add,
@@ -410,7 +412,7 @@ use synthez_core::codegen;
 pub fn derive_parse_attrs(input: TokenStream) -> TokenStream {
     syn::parse(input)
         .and_then(codegen::parse_attrs::derive)
-        .unwrap_or_else(|e| e.to_compile_error())
+        .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
 
@@ -462,7 +464,7 @@ pub fn derive_parse_attrs(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(ToTokens, attributes(to_tokens))]
 pub fn derive_to_tokens(input: TokenStream) -> TokenStream {
     syn::parse(input)
-        .and_then(|input| codegen::to_tokens::derive(&input))
-        .unwrap_or_else(|e| e.to_compile_error())
+        .and_then(|i| codegen::to_tokens::derive(&i))
+        .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }

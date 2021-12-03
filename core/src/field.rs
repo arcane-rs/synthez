@@ -96,7 +96,7 @@ impl<V> Container<V> for Required<V> {
     }
 
     fn replace(&mut self, val: V) -> Option<V> {
-        Self::replace(self, val)
+        Self::replace_with(self, val)
     }
 }
 
@@ -112,7 +112,6 @@ impl<V: PartialEq> Container<V> for Vec<V> {
     }
 
     fn replace(&mut self, val: V) -> Option<V> {
-        #[allow(clippy::option_if_let_else)] // false positive: moving `val`
         if let Some(old) = self.iter_mut().find(|v| *v == &val) {
             Some(mem::replace(old, val))
         } else {
@@ -229,7 +228,7 @@ impl<T> Required<T> {
     /// Replaces the underlying `value` with the given one in this [`Required`]
     /// [`Container`], returning the previous one, if any.
     #[must_use]
-    pub(crate) fn replace(&mut self, value: T) -> Option<T> {
+    pub(crate) fn replace_with(&mut self, value: T) -> Option<T> {
         self.0.replace(value)
     }
 
