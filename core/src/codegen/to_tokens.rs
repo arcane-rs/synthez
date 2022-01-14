@@ -32,6 +32,7 @@ pub fn derive(input: &syn::DeriveInput) -> syn::Result<TokenStream> {
     if !matches!(&input.data, syn::Data::Enum(_) | syn::Data::Struct(_)) {
         return Err(syn::Error::new_spanned(
             input,
+            // TODO: Use "{TRAIT_NAME}" syntax once MSRV bumps above 1.58.
             format!("only structs and enums can derive {}", TRAIT_NAME),
         ));
     }
@@ -112,6 +113,7 @@ impl ParseAttrs for Attrs {
         if self.append.is_empty() {
             return Err(syn::Error::new(
                 item_span,
+                // TODO: Use "{attr_name}" syntax once MSRV bumps above 1.58.
                 format!(
                     "`#[{}(append(<function>))]` attribute is expected",
                     attr_name,

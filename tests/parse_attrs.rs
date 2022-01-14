@@ -125,6 +125,7 @@ mod ident {
             assert!(res.is_err(), "should fail, but is ok");
 
             let err = res.unwrap_err().to_string();
+            // TODO: Use "{err:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 err.contains(
                     "`required` argument of `#[attr]` attribute is expected",
@@ -605,6 +606,7 @@ mod value {
             assert!(res.is_err(), "should fail, but is ok");
 
             let err = res.unwrap_err().to_string();
+            // TODO: Use "{err:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 err.contains(
                     "`name` argument of `#[attr]` attribute is expected",
@@ -668,6 +670,7 @@ mod value {
             assert!(res.is_err(), "should fail, but is ok");
 
             let err = res.unwrap_err().to_string();
+            // TODO: Use "{err:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 err.contains(
                     "either `name` or `required` argument of `#[attr]` \
@@ -1190,6 +1193,7 @@ mod map {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap().on;
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert_eq!(out.len(), 2, "wrong length of {:?}", out);
             assert_eq!(
                 out.get(&syn::Ident::new_on_call_site("minas"))
@@ -1256,6 +1260,7 @@ mod map {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap().on;
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert_eq!(out.len(), 1, "wrong length of {:?}", out);
             assert_eq!(
                 out.get(&syn::Ident::new_on_call_site("minas"))
@@ -1277,6 +1282,7 @@ mod map {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap().on;
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert_eq!(out.len(), 1, "wrong length of {:?}", out);
             assert_eq!(
                 out.get(&syn::Ident::new_on_call_site("fallen"))
@@ -1309,6 +1315,7 @@ mod map {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap().on;
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert_eq!(out.len(), 1, "wrong length of {:?}", out);
             assert_eq!(
                 out.get(&syn::Ident::new_on_call_site("minas"))
@@ -1355,6 +1362,7 @@ mod map {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap().on;
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert_eq!(out.len(), 1, "wrong length of {:?}", out);
             assert_eq!(
                 out.get(&syn::Ident::new_on_call_site("minas"))
@@ -1377,6 +1385,7 @@ mod map {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap().on;
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert_eq!(out.len(), 1, "wrong length of {:?}", out);
             assert_eq!(
                 out.get(&syn::Ident::new_on_call_site("minas"))
@@ -1409,6 +1418,7 @@ mod map {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap().on;
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert_eq!(out.len(), 1, "wrong length of {:?}", out);
             assert_eq!(
                 out.get(&syn::Ident::new_on_call_site("minas"))
@@ -1431,6 +1441,7 @@ mod map {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap().on;
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert_eq!(out.len(), 1, "wrong length of {:?}", out);
             assert_eq!(
                 out.get(&syn::Ident::new_on_call_site("minas"))
@@ -1526,6 +1537,7 @@ mod map {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap().on;
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert_eq!(out.len(), 1, "wrong length of {:?}", out);
             assert_eq!(
                 out.get(&syn::Ident::new_on_call_site("minas"))
@@ -1558,6 +1570,7 @@ mod map {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap().on;
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert_eq!(out.len(), 1, "wrong length of {:?}", out);
             assert_eq!(
                 out.get(&syn::Ident::new_on_call_site("minas"))
@@ -1715,6 +1728,7 @@ mod map {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap().r#type;
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert_eq!(out.len(), 2, "wrong length of {:?}", out);
             assert_eq!(
                 out.get(&syn::Ident::new_on_call_site("minas"))
@@ -1765,6 +1779,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 out.sub.is_some(),
                 "outer absent, but shouldn't: {:?}",
@@ -1787,6 +1802,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 out.sub.is_some(),
                 "outer absent, but shouldn't: {:?}",
@@ -1809,6 +1825,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 out.sub.is_none(),
                 "outer present, but shouldn't: {:?}",
@@ -1860,6 +1877,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 out.sub.is_some(),
                 "outer absent, but shouldn't: {:?}",
@@ -1882,6 +1900,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 out.sub.is_some(),
                 "outer absent, but shouldn't: {:?}",
@@ -1889,7 +1908,7 @@ mod nested {
             );
             assert_eq!(
                 out.sub.unwrap().ignore,
-                Some(syn::Ident::new_on_call_site("fallen"))
+                Some(syn::Ident::new_on_call_site("fallen")),
             );
         }
 
@@ -1903,6 +1922,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 out.sub.is_some(),
                 "outer absent, but shouldn't: {:?}",
@@ -1910,7 +1930,7 @@ mod nested {
             );
             assert_eq!(
                 out.sub.unwrap().ignore,
-                Some(syn::Ident::new_on_call_site("fall"))
+                Some(syn::Ident::new_on_call_site("fall")),
             );
         }
     }
@@ -1957,6 +1977,7 @@ mod nested {
             assert!(res.is_err(), "should fail, but is ok");
 
             let err = res.unwrap_err().to_string();
+            // TODO: Use "{err:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 err.contains(
                     "`ignore` argument of `#[attr(sub)]` attribute is expected",
@@ -1976,6 +1997,7 @@ mod nested {
             assert!(res.is_err(), "should fail, but is ok");
 
             let err = res.unwrap_err().to_string();
+            // TODO: Use "{err:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 err.contains(
                     "`sub` argument of `#[attr]` attribute is expected",
@@ -2012,6 +2034,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap().sub;
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert_eq!(out.len(), 2, "wrong length of {:?}", out);
             assert_eq!(
                 out[0].ignore,
@@ -2054,6 +2077,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 out.sub.is_some(),
                 "outer absent, but shouldn't: {:?}",
@@ -2061,7 +2085,7 @@ mod nested {
             );
             assert_eq!(
                 out.sub.unwrap().ignore,
-                Some(syn::Ident::new_on_call_site("i"))
+                Some(syn::Ident::new_on_call_site("i")),
             );
         }
 
@@ -2120,6 +2144,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 out.sub.is_some(),
                 "outer absent, but shouldn't: {:?}",
@@ -2127,7 +2152,7 @@ mod nested {
             );
             assert_eq!(
                 out.sub.unwrap().ignore,
-                Some(syn::Ident::new_on_call_site("i"))
+                Some(syn::Ident::new_on_call_site("i")),
             );
         }
 
@@ -2142,6 +2167,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 out.sub.is_some(),
                 "outer absent, but shouldn't: {:?}",
@@ -2149,7 +2175,7 @@ mod nested {
             );
             assert_eq!(
                 out.sub.unwrap().ignore,
-                Some(syn::Ident::new_on_call_site("ignore"))
+                Some(syn::Ident::new_on_call_site("ignore")),
             );
         }
 
@@ -2164,6 +2190,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 out.sub.is_some(),
                 "outer absent, but shouldn't: {:?}",
@@ -2171,7 +2198,7 @@ mod nested {
             );
             assert_eq!(
                 out.sub.unwrap().ignore,
-                Some(syn::Ident::new_on_call_site("i"))
+                Some(syn::Ident::new_on_call_site("i")),
             );
         }
     }
@@ -2202,6 +2229,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 out.sub.is_some(),
                 "outer absent, but shouldn't: {:?}",
@@ -2209,7 +2237,7 @@ mod nested {
             );
             assert_eq!(
                 out.sub.unwrap().ignore,
-                Some(syn::Ident::new_on_call_site("i"))
+                Some(syn::Ident::new_on_call_site("i")),
             );
         }
 
@@ -2224,6 +2252,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 out.sub.is_some(),
                 "outer absent, but shouldn't: {:?}",
@@ -2231,7 +2260,7 @@ mod nested {
             );
             assert_eq!(
                 out.sub.unwrap().ignore,
-                Some(syn::Ident::new_on_call_site("skip"))
+                Some(syn::Ident::new_on_call_site("skip")),
             );
         }
 
@@ -2352,6 +2381,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 out.sub.is_some(),
                 "outer absent, but shouldn't: {:?}",
@@ -2359,7 +2389,7 @@ mod nested {
             );
             assert_eq!(
                 out.sub.unwrap().ignore,
-                Some(syn::Ident::new_on_call_site("skip"))
+                Some(syn::Ident::new_on_call_site("skip")),
             );
         }
     }
@@ -2391,6 +2421,7 @@ mod nested {
             assert!(res.is_ok(), "failed: {}", res.unwrap_err());
 
             let out = res.unwrap();
+            // TODO: Use "{out:?}" syntax once MSRV bumps above 1.58.
             assert!(
                 out.sub.is_some(),
                 "outer absent, but shouldn't: {:?}",
@@ -2398,7 +2429,7 @@ mod nested {
             );
             assert_eq!(
                 out.sub.unwrap().ignore,
-                Some(syn::Ident::new_on_call_site("ignore"))
+                Some(syn::Ident::new_on_call_site("ignore")),
             );
         }
     }

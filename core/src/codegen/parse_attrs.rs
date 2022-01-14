@@ -42,6 +42,7 @@ pub fn derive(input: syn::DeriveInput) -> syn::Result<TokenStream> {
     if !matches!(&input.data, syn::Data::Struct(_)) {
         return Err(syn::Error::new_spanned(
             input,
+            // TODO: Use "{TRAIT_NAME}" syntax once MSRV bumps above 1.58.
             format!("only structs can derive {}", TRAIT_NAME),
         ));
     }
@@ -354,6 +355,7 @@ impl Field {
         } else {
             format!("`{}`", self.names[0])
         };
+        // TODO: Use "{arg_names}" syntax once MSRV bumps above 1.58.
         let err_msg =
             format!("{} argument of `#[{{}}]` attribute {{}}", arg_names);
 
@@ -592,6 +594,8 @@ impl Parse for Spanning<Kind> {
                         if val != "spaced" {
                             return Err(syn::Error::new_spanned(
                                 inner,
+                                // TODO: Use "{val}" syntax once MSRV bumps
+                                //       above 1.58.
                                 format!("invalid value setting: {} ", val),
                             ));
                         }
@@ -604,8 +608,9 @@ impl Parse for Spanning<Kind> {
                 val => {
                     return Err(syn::Error::new_spanned(
                         ident,
+                        // TODO: Use "{val}" syntax once MSRV bumps above 1.58.
                         format!("invalid kind value: {} ", val),
-                    ))
+                    ));
                 }
             },
             &ident,
@@ -658,8 +663,9 @@ impl Parse for Spanning<Dedup> {
                 val => {
                     return Err(syn::Error::new_spanned(
                         ident,
+                        // TODO: Use "{val}" syntax once MSRV bumps above 1.58.
                         format!("invalid dedup value: {} ", val),
-                    ))
+                    ));
                 }
             },
             &ident,
