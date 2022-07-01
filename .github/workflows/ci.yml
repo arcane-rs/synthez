@@ -17,9 +17,6 @@ jobs:
   ##########################
 
   clippy:
-    if: ${{ github.ref == 'refs/heads/main'
-            || startsWith(github.ref, 'refs/tags/v')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -32,9 +29,6 @@ jobs:
       - run: make cargo.lint
 
   rustfmt:
-    if: ${{ github.ref == 'refs/heads/main'
-            || startsWith(github.ref, 'refs/tags/v')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -53,11 +47,7 @@ jobs:
   # Testing #
   ###########
 
-  cargo-feature:
-    name: Cargo feature
-    if: ${{ github.ref == 'refs/heads/main'
-            || startsWith(github.ref, 'refs/tags/v')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
+  feature:
     strategy:
       fail-fast: false
       matrix:
@@ -89,9 +79,6 @@ jobs:
 
   msrv:
     name: MSRV
-    if: ${{ github.ref == 'refs/heads/main'
-            || startsWith(github.ref, 'refs/tags/v')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
     strategy:
       fail-fast: false
       matrix:
@@ -118,9 +105,6 @@ jobs:
       - run: make test.cargo
 
   test:
-    if: ${{ github.ref == 'refs/heads/main'
-            || startsWith(github.ref, 'refs/tags/v')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
     strategy:
       fail-fast: false
       matrix:
@@ -155,9 +139,6 @@ jobs:
   #################
 
   rustdoc:
-    if: ${{ github.ref == 'refs/heads/main'
-            || startsWith(github.ref, 'refs/tags/v')
-            || !contains(github.event.head_commit.message, '[skip ci]') }}
     strategy:
       matrix:
         crate:
@@ -183,7 +164,7 @@ jobs:
 
   release-github:
     name: Release on GitHub
-    needs: ["cargo-feature", "clippy", "msrv", "rustdoc", "rustfmt", "test"]
+    needs: ["clippy", "feature", "msrv", "rustdoc", "rustfmt", "test"]
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     runs-on: ubuntu-latest
     steps:
@@ -208,8 +189,7 @@ jobs:
 
       - name: Parse CHANGELOG link
         id: changelog
-        run: echo ::set-output
-          name=LINK::https://github.com/${{ github.repository }}/blob/v${{ steps.release.outputs.VERSION }}/CHANGELOG.md#$(sed -n '/^## \[${{ steps.release.outputs.VERSION }}\]/{s/^## \[\(.*\)\][^0-9]*\([0-9].*\)/\1--\2/;s/[^0-9a-z-]*//g;p;}' CHANGELOG.md)
+        run: echo ::set-output name=LINK::https://github.com/${{ github.repository }}/blob/v${{ steps.release.outputs.VERSION }}/CHANGELOG.md#$(sed -n '/^## \[${{ steps.release.outputs.VERSION }}\]/{s/^## \[\(.*\)\][^0-9]*\([0-9].*\)/\1--\2/;s/[^0-9a-z-]*//g;p;}' CHANGELOG.md)
 
       - uses: softprops/action-gh-release@v1
         env:
