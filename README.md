@@ -2,12 +2,12 @@ synthez
 =======
 
 [![Rust docs](https://docs.rs/synthez/badge.svg "Rust docs")](https://docs.rs/synthez)
-[![CI](https://github.com/arcana-rs/synthez/workflows/CI/badge.svg?branch=master "CI")](https://github.com/arcana-rs/synthez/actions?query=workflow%3ACI+branch%3Amaster)
+[![CI](https://github.com/arcana-rs/synthez/workflows/CI/badge.svg?branch=main "CI")](https://github.com/arcana-rs/synthez/actions?query=workflow%3ACI+branch%3Amain)
 [![Rust 1.56+](https://img.shields.io/badge/rustc-1.56+-lightgray.svg "Rust 1.56+")](https://blog.rust-lang.org/2021/10/21/Rust-1.56.0.html)
 [![Unsafe Forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg "Unsafe forbidden")](https://github.com/rust-secure-code/safety-dance)
 
 [API Docs](https://docs.rs/synthez) |
-[Changelog](https://github.com/arcana-rs/synthez/blob/master/CHANGELOG.md)
+[Changelog](https://github.com/arcana-rs/synthez/blob/main/CHANGELOG.md)
 
 Steroids for [`syn`], [`quote`] and [`proc_macro2`] crates.
 
@@ -186,7 +186,7 @@ assert_eq!(derive(input).unwrap().to_string(), output.to_string());
 
 ## License
 
-This software is subject to the terms of the [Blue Oak Model License 1.0.0](https://github.com/instrumentisto/tracerr-rs/blob/master/LICENSE.md). If a copy of the [BlueOak-1.0.0](https://spdx.org/licenses/BlueOak-1.0.0.html) license was not distributed with this file, You can obtain one at <https://blueoakcouncil.org/license/1.0.0>.
+This software is subject to the terms of the [Blue Oak Model License 1.0.0](https://github.com/instrumentisto/tracerr-rs/blob/main/LICENSE.md). If a copy of the [BlueOak-1.0.0](https://spdx.org/licenses/BlueOak-1.0.0.html) license was not distributed with this file, You can obtain one at <https://blueoakcouncil.org/license/1.0.0>.
 
 
 

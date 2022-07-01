@@ -2,11 +2,11 @@ name: Security audit
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
     tags: ["v*"]
     paths: ["**/Cargo.toml"]
   pull_request:
-    branches: ["master"]
+    branches: ["main"]
     paths: ["**/Cargo.toml"]
   schedule:
     - cron: "7 7 * * *"

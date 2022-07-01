@@ -2,10 +2,10 @@ name: CI
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
     tags: ["v*"]
   pull_request:
-    branches: ["master"]
+    branches: ["main"]
 
 env:
   RUST_BACKTRACE: 1
@@ -17,7 +17,7 @@ jobs:
   ##########################
 
   clippy:
-    if: ${{ github.ref == 'refs/heads/master'
+    if: ${{ github.ref == 'refs/heads/main'
             || startsWith(github.ref, 'refs/tags/v')
             || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
@@ -32,7 +32,7 @@ jobs:
       - run: make cargo.lint
 
   rustfmt:
-    if: ${{ github.ref == 'refs/heads/master'
+    if: ${{ github.ref == 'refs/heads/main'
             || startsWith(github.ref, 'refs/tags/v')
             || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
@@ -55,7 +55,7 @@ jobs:
 
   cargo-feature:
     name: Cargo feature
-    if: ${{ github.ref == 'refs/heads/master'
+    if: ${{ github.ref == 'refs/heads/main'
             || startsWith(github.ref, 'refs/tags/v')
             || !contains(github.event.head_commit.message, '[skip ci]') }}
     strategy:
@@ -89,7 +89,7 @@ jobs:
 
   msrv:
     name: MSRV
-    if: ${{ github.ref == 'refs/heads/master'
+    if: ${{ github.ref == 'refs/heads/main'
             || startsWith(github.ref, 'refs/tags/v')
             || !contains(github.event.head_commit.message, '[skip ci]') }}
     strategy:
@@ -118,7 +118,7 @@ jobs:
       - run: make test.cargo
 
   test:
-    if: ${{ github.ref == 'refs/heads/master'
+    if: ${{ github.ref == 'refs/heads/main'
             || startsWith(github.ref, 'refs/tags/v')
             || !contains(github.event.head_commit.message, '[skip ci]') }}
     strategy:
@@ -155,7 +155,7 @@ jobs:
   #################
 
   rustdoc:
-    if: ${{ github.ref == 'refs/heads/master'
+    if: ${{ github.ref == 'refs/heads/main'
             || startsWith(github.ref, 'refs/tags/v')
             || !contains(github.event.head_commit.message, '[skip ci]') }}
     strategy:
