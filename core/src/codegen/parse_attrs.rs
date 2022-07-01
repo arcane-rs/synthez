@@ -634,9 +634,10 @@ impl ToTokens for Kind {
 }
 
 /// Field [`dedup`]lication strategy parsed from [`syn::Attribute`]s.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 enum Dedup {
     /// Only a single value of the field is allowed to appear.
+    #[default]
     Unique,
 
     /// Only the first parsed value of the field is picked.
@@ -644,12 +645,6 @@ enum Dedup {
 
     /// Only the last parsed value of the field is picked.
     Last,
-}
-
-impl Default for Dedup {
-    fn default() -> Self {
-        Self::Unique
-    }
 }
 
 impl Parse for Spanning<Dedup> {

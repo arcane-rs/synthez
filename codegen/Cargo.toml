@@ -2,7 +2,7 @@
 name = "synthez-codegen"
 version = "0.2.0"
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.62"
 description = "Internal codegen shim of `synthez` crate."
 authors = ["Kai Ren <tyranron@gmail.com>"]
 license = "BlueOak-1.0.0"

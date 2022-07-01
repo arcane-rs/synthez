@@ -972,7 +972,7 @@ pub mod validate {
 
         impl<V> Validation<rule::Provided> for Required<V> {
             fn validation(&self) -> syn::Result<()> {
-                self.is_present().then(|| ()).ok_or_else(|| {
+                self.is_present().then_some(()).ok_or_else(|| {
                     syn::Error::new(
                         Span::call_site(),
                         "is expected to be present, but is absent",

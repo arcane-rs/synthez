@@ -13,7 +13,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- Set MSRV to [1.56.0](https://blog.rust-lang.org/2021/10/21/Rust-1.56.0.html). ([3e6d0846])
+- Set MSRV to [1.62.0](https://blog.rust-lang.org/2022/06/30/Rust-1.62.0.html). ([todo])
 
 ### Fixed
 

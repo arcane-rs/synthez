@@ -2,7 +2,7 @@
 name = "synthez"
 version = "0.2.0"
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.62"
 description = "Steroids for `syn`, `quote` and `proc-macro2` crates."
 authors = ["Kai Ren <tyranron@gmail.com>"]
 license = "BlueOak-1.0.0"
