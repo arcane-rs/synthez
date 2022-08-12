@@ -282,7 +282,7 @@ impl<'a, T> IntoIterator for &'a Required<T> {
     type IntoIter = iter::Once<&'a T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        iter::once(&*self)
+        iter::once(&**self)
     }
 }
 

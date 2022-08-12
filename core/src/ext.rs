@@ -58,7 +58,7 @@ pub trait Data {
 impl Data for syn::Data {
     fn named_fields(self) -> syn::Result<Punctuated<syn::Field, token::Comma>> {
         match self {
-            syn::Data::Struct(data) => match data.fields {
+            Self::Struct(data) => match data.fields {
                 syn::Fields::Named(f) => Ok(f.named),
                 fields @ (syn::Fields::Unnamed(_) | syn::Fields::Unit) => {
                     Err(syn::Error::new_spanned(
@@ -67,11 +67,11 @@ impl Data for syn::Data {
                     ))
                 }
             },
-            syn::Data::Enum(data) => Err(syn::Error::new_spanned(
+            Self::Enum(data) => Err(syn::Error::new_spanned(
                 data.enum_token,
                 "expected struct only",
             )),
-            syn::Data::Union(data) => Err(syn::Error::new_spanned(
+            Self::Union(data) => Err(syn::Error::new_spanned(
                 data.union_token,
                 "expected struct only",
             )),
@@ -82,7 +82,7 @@ impl Data for syn::Data {
         &self,
     ) -> syn::Result<&Punctuated<syn::Field, token::Comma>> {
         match self {
-            syn::Data::Struct(data) => match &data.fields {
+            Self::Struct(data) => match &data.fields {
                 syn::Fields::Named(f) => Ok(&f.named),
                 fields @ (syn::Fields::Unnamed(_) | syn::Fields::Unit) => {
                     Err(syn::Error::new_spanned(
@@ -91,11 +91,11 @@ impl Data for syn::Data {
                     ))
                 }
             },
-            syn::Data::Enum(data) => Err(syn::Error::new_spanned(
+            Self::Enum(data) => Err(syn::Error::new_spanned(
                 data.enum_token,
                 "expected struct only",
             )),
-            syn::Data::Union(data) => Err(syn::Error::new_spanned(
+            Self::Union(data) => Err(syn::Error::new_spanned(
                 data.union_token,
                 "expected struct only",
             )),
@@ -106,7 +106,7 @@ impl Data for syn::Data {
         self,
     ) -> syn::Result<Punctuated<syn::Field, token::Comma>> {
         match self {
-            syn::Data::Struct(data) => match data.fields {
+            Self::Struct(data) => match data.fields {
                 syn::Fields::Unnamed(f) => Ok(f.unnamed),
                 fields @ (syn::Fields::Named(_) | syn::Fields::Unit) => {
                     Err(syn::Error::new_spanned(
@@ -115,11 +115,11 @@ impl Data for syn::Data {
                     ))
                 }
             },
-            syn::Data::Enum(data) => Err(syn::Error::new_spanned(
+            Self::Enum(data) => Err(syn::Error::new_spanned(
                 data.enum_token,
                 "expected struct only",
             )),
-            syn::Data::Union(data) => Err(syn::Error::new_spanned(
+            Self::Union(data) => Err(syn::Error::new_spanned(
                 data.union_token,
                 "expected struct only",
             )),
@@ -130,7 +130,7 @@ impl Data for syn::Data {
         &self,
     ) -> syn::Result<&Punctuated<syn::Field, token::Comma>> {
         match self {
-            syn::Data::Struct(data) => match &data.fields {
+            Self::Struct(data) => match &data.fields {
                 syn::Fields::Unnamed(f) => Ok(&f.unnamed),
                 fields @ (syn::Fields::Named(_) | syn::Fields::Unit) => {
                     Err(syn::Error::new_spanned(
@@ -139,11 +139,11 @@ impl Data for syn::Data {
                     ))
                 }
             },
-            syn::Data::Enum(data) => Err(syn::Error::new_spanned(
+            Self::Enum(data) => Err(syn::Error::new_spanned(
                 data.enum_token,
                 "expected struct only",
             )),
-            syn::Data::Union(data) => Err(syn::Error::new_spanned(
+            Self::Union(data) => Err(syn::Error::new_spanned(
                 data.union_token,
                 "expected struct only",
             )),

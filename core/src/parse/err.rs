@@ -19,8 +19,7 @@ pub fn dup_attr_arg<S: IntoSpan>(span: S) -> syn::Error {
 pub fn unknown_attr_arg<S: IntoSpan>(span: S, name: &str) -> syn::Error {
     syn::Error::new(
         span.into_span(),
-        // TODO: Use "{name}" syntax once MSRV bumps above 1.58.
-        format!("unknown `{}` attribute argument", name),
+        format!("unknown `{name}` attribute argument"),
     )
 }
 

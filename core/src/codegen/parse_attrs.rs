@@ -42,8 +42,7 @@ pub fn derive(input: syn::DeriveInput) -> syn::Result<TokenStream> {
     if !matches!(&input.data, syn::Data::Struct(_)) {
         return Err(syn::Error::new_spanned(
             input,
-            // TODO: Use "{TRAIT_NAME}" syntax once MSRV bumps above 1.58.
-            format!("only structs can derive {}", TRAIT_NAME),
+            format!("only structs can derive {TRAIT_NAME}"),
         ));
     }
 
@@ -355,9 +354,8 @@ impl Field {
         } else {
             format!("`{}`", self.names[0])
         };
-        // TODO: Use "{arg_names}" syntax once MSRV bumps above 1.58.
         let err_msg =
-            format!("{} argument of `#[{{}}]` attribute {{}}", arg_names);
+            format!("{arg_names} argument of `#[{{}}]` attribute {{}}");
 
         quote! {
             if let Err(e) = <#ty as ::synthez::parse::attrs::Validation<
@@ -543,9 +541,8 @@ impl ParseAttrs for FieldAttrs {
             return Err(syn::Error::new(
                 item_span,
                 format!(
-                    "either `ident`, `value` or `map` argument of `#[{}]` \
-                     attribute is expected",
-                    attr_name,
+                    "either `ident`, `value` or `map` argument of \
+                     `#[{attr_name}]` attribute is expected",
                 ),
             ));
         }
@@ -594,9 +591,7 @@ impl Parse for Spanning<Kind> {
                         if val != "spaced" {
                             return Err(syn::Error::new_spanned(
                                 inner,
-                                // TODO: Use "{val}" syntax once MSRV bumps
-                                //       above 1.58.
-                                format!("invalid value setting: {} ", val),
+                                format!("invalid value setting: {val} "),
                             ));
                         }
                         Kind::Value(true)
@@ -608,8 +603,7 @@ impl Parse for Spanning<Kind> {
                 val => {
                     return Err(syn::Error::new_spanned(
                         ident,
-                        // TODO: Use "{val}" syntax once MSRV bumps above 1.58.
-                        format!("invalid kind value: {} ", val),
+                        format!("invalid kind value: {val} "),
                     ));
                 }
             },
@@ -658,8 +652,7 @@ impl Parse for Spanning<Dedup> {
                 val => {
                     return Err(syn::Error::new_spanned(
                         ident,
-                        // TODO: Use "{val}" syntax once MSRV bumps above 1.58.
-                        format!("invalid dedup value: {} ", val),
+                        format!("invalid dedup value: {val} "),
                     ));
                 }
             },
