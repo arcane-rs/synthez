@@ -81,11 +81,11 @@ impl<V: Attrs + Default + Parse> Attrs for Box<V> {
     }
 
     fn validate(&self, attr_name: &str, item_span: Span) -> syn::Result<()> {
-        (&**self).validate(attr_name, item_span)
+        (**self).validate(attr_name, item_span)
     }
 
     fn fallback(&mut self, attrs: &[syn::Attribute]) -> syn::Result<()> {
-        (&mut **self).fallback(attrs)
+        (**self).fallback(attrs)
     }
 
     fn parse_attrs<T>(name: &str, item: &T) -> syn::Result<Self>
