@@ -115,7 +115,7 @@ use synthez as _; // for docs only
 /// # Field requirements
 ///
 /// Each field should be wrapped into a [`field::Container`] implementor, which
-/// describes and influes the parsing logic. Use [`Required`]
+/// describes and influences the parsing logic. Use [`Required`]
 /// [`field::Container`] in case your parsing logic demands mandatory specifying
 /// of a value.
 ///
