@@ -24,9 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
           components: clippy
 
@@ -36,9 +35,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: nightly
           components: rustfmt
 
@@ -62,15 +60,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
-          toolchain: nightly
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
           toolchain: stable
-          override: true
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: nightly
 
       - run: cargo +nightly update -Z minimal-versions
 
@@ -94,15 +89,13 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
-          toolchain: nightly
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
           toolchain: ${{ matrix.msrv }}
-          override: true
+      - run: rustup default ${{ matrix.msrv }}
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: nightly
 
       - run: cargo +nightly update -Z minimal-versions
 
@@ -127,11 +120,10 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: ${{ matrix.toolchain }}
-          override: true
+      - run: rustup default ${{ matrix.toolchain }}
 
       - run: make test.cargo crate=${{ matrix.crate }}
 
@@ -152,9 +144,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: nightly
 
       - run: make cargo.doc crate=${{ matrix.crate }}
@@ -175,9 +166,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
 
       - name: Publish `synthez-core` crate
