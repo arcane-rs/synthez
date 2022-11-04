@@ -9,7 +9,7 @@ pub trait Attrs {
 
 impl Attrs for Vec<syn::Attribute> {
     fn attrs(&self) -> &[syn::Attribute] {
-        &**self
+        self
     }
 }
 
