@@ -102,7 +102,6 @@
     unused_qualifications,
     unused_results,
     unused_tuple_struct_fields,
-    unused_tuple_struct_fields,
     variant_size_differences
 )]
 

@@ -2,12 +2,12 @@ synthez
 =======
 
 [![Rust docs](https://docs.rs/synthez/badge.svg "Rust docs")](https://docs.rs/synthez)
-[![CI](https://github.com/arcana-rs/synthez/workflows/CI/badge.svg?branch=main "CI")](https://github.com/arcana-rs/synthez/actions?query=workflow%3ACI+branch%3Amain)
+[![CI](https://github.com/arcane-rs/synthez/workflows/CI/badge.svg?branch=main "CI")](https://github.com/arcane-rs/synthez/actions?query=workflow%3ACI+branch%3Amain)
 [![Rust 1.62+](https://img.shields.io/badge/rustc-1.62+-lightgray.svg "Rust 1.62+")](https://blog.rust-lang.org/2022/06/30/Rust-1.62.0.html)
 [![Unsafe Forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg "Unsafe forbidden")](https://github.com/rust-secure-code/safety-dance)
 
 [API Docs](https://docs.rs/synthez) |
-[Changelog](https://github.com/arcana-rs/synthez/blob/main/CHANGELOG.md)
+[Changelog](https://github.com/arcane-rs/synthez/blob/main/CHANGELOG.md)
 
 Steroids for [`syn`], [`quote`] and [`proc_macro2`] crates.
 
