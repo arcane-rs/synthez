@@ -162,7 +162,9 @@ impl Definition {
                 fn parse(
                     input: ::synthez::syn::parse::ParseStream<'_>,
                 ) -> ::synthez::syn::Result<Self> {
-                    let mut out = <#ty #ty_generics as Default>::default();
+                    let mut out =
+                        <#ty #ty_generics as ::std::default::Default>
+                            ::default();
                     while !input.is_empty() {
                         let ident =
                             ::synthez::ParseBufferExt::parse_any_ident(
