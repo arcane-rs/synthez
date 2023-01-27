@@ -1,10 +1,11 @@
 synthez
 =======
 
-[![Rust docs](https://docs.rs/synthez/badge.svg "Rust docs")](https://docs.rs/synthez)
-[![CI](https://github.com/arcane-rs/synthez/workflows/CI/badge.svg?branch=main "CI")](https://github.com/arcane-rs/synthez/actions?query=workflow%3ACI+branch%3Amain)
+[![crates.io](https://img.shields.io/crates/v/synthez.svg "crates.io")](https://crates.io/crates/synthez)
 [![Rust 1.62+](https://img.shields.io/badge/rustc-1.62+-lightgray.svg "Rust 1.62+")](https://blog.rust-lang.org/2022/06/30/Rust-1.62.0.html)
-[![Unsafe Forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg "Unsafe forbidden")](https://github.com/rust-secure-code/safety-dance)
+[![Unsafe Forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg "Unsafe forbidden")](https://github.com/rust-secure-code/safety-dance)  
+[![CI](https://github.com/arcane-rs/synthez/workflows/CI/badge.svg?branch=main "CI")](https://github.com/arcane-rs/synthez/actions?query=workflow%3ACI+branch%3Amain)
+[![Rust docs](https://docs.rs/synthez/badge.svg "Rust docs")](https://docs.rs/synthez)
 
 [API Docs](https://docs.rs/synthez) |
 [Changelog](https://github.com/arcane-rs/synthez/blob/main/CHANGELOG.md)
