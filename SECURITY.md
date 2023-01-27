@@ -1,7 +1,7 @@
 Security Policy
 ===============
 
-Security policy of [`synthez`] crate (and its [`tracerr-codegen`] and [`tracerr-core`] sub-crates).
+Security policy of [`synthez`] crate (and its [`synthez-codegen`] and [`synthez-core`] sub-crates).
 
 
 
@@ -32,9 +32,9 @@ Project maintainers publish a [public advisory][1] to the community [via GitHub]
 
 
 
-[`tracerr`]: https://docs.rs/tracerr
-[`tracerr-codegen`]: https://docs.rs/tracerr-codegen
-[`tracerr-core`]: https://docs.rs/tracerr-code
+[`synthez`]: https://docs.rs/synthez
+[`synthez-codegen`]: https://docs.rs/synthez-codegen
+[`synthez-core`]: https://docs.rs/synthez-core
 
 [1]: /../../security/advisories
 [2]: /../../issues
