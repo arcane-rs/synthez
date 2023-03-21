@@ -60,9 +60,9 @@ impl Data for syn::Data {
         match self {
             Self::Struct(data) => match data.fields {
                 syn::Fields::Named(f) => Ok(f.named),
-                fields @ (syn::Fields::Unnamed(_) | syn::Fields::Unit) => {
+                syn::Fields::Unit | syn::Fields::Unnamed(_) => {
                     Err(syn::Error::new_spanned(
-                        fields,
+                        &data.fields,
                         "expected named struct fields only",
                     ))
                 }
@@ -84,9 +84,9 @@ impl Data for syn::Data {
         match self {
             Self::Struct(data) => match &data.fields {
                 syn::Fields::Named(f) => Ok(&f.named),
-                fields @ (syn::Fields::Unnamed(_) | syn::Fields::Unit) => {
+                syn::Fields::Unit | syn::Fields::Unnamed(_) => {
                     Err(syn::Error::new_spanned(
-                        fields,
+                        &data.fields,
                         "expected named struct fields only",
                     ))
                 }
@@ -108,9 +108,9 @@ impl Data for syn::Data {
         match self {
             Self::Struct(data) => match data.fields {
                 syn::Fields::Unnamed(f) => Ok(f.unnamed),
-                fields @ (syn::Fields::Named(_) | syn::Fields::Unit) => {
+                syn::Fields::Unit | syn::Fields::Named(_) => {
                     Err(syn::Error::new_spanned(
-                        fields,
+                        &data.fields,
                         "expected unnamed struct fields only",
                     ))
                 }
@@ -132,9 +132,9 @@ impl Data for syn::Data {
         match self {
             Self::Struct(data) => match &data.fields {
                 syn::Fields::Unnamed(f) => Ok(&f.unnamed),
-                fields @ (syn::Fields::Named(_) | syn::Fields::Unit) => {
+                syn::Fields::Unit | syn::Fields::Named(_) => {
                     Err(syn::Error::new_spanned(
-                        fields,
+                        &data.fields,
                         "expected unnamed struct fields only",
                     ))
                 }

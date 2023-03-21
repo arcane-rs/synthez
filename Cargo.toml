@@ -34,7 +34,7 @@ synthez-core = { version = "0.2", path = "./core" }
 # Repeats the one from `synthez-core` crate.
 # For correct Rust docs rendering only!
 # TODO: Remove once docs render correctly without it.
-syn = { version = "1.0.72", features = ["clone-impls", "derive", "extra-traits", "parsing", "printing"], default-features = false }
+syn = { version = "2.0", features = ["clone-impls", "derive", "extra-traits", "parsing", "printing"], default-features = false }
 
 [workspace]
 members = ["codegen", "core"]

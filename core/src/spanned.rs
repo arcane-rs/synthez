@@ -34,6 +34,14 @@ impl<T: Spanned> IntoSpan for &T {
     }
 }
 
+#[sealed]
+impl<T> IntoSpan for &Spanning<T> {
+    #[inline]
+    fn into_span(self) -> Span {
+        self.span()
+    }
+}
+
 /// Wrapper for non-[`Spanned`] types to hold their [`Span`].
 #[derive(Clone, Copy, Debug)]
 pub struct Spanning<T: ?Sized> {
@@ -58,6 +66,14 @@ impl<T> Spanning<T> {
     #[must_use]
     pub fn into_inner(self) -> T {
         self.item
+    }
+}
+
+impl<T: ?Sized> Spanning<T> {
+    /// Returns the [`Span`] contained in this [`Spanning`] wrapper.
+    #[must_use]
+    pub const fn span(&self) -> Span {
+        self.span
     }
 }
 
@@ -86,13 +102,6 @@ where
 }
 
 impl<T: PartialEq + ?Sized> Eq for Spanning<T> {}
-
-impl<T: ?Sized> Spanned for Spanning<T> {
-    #[inline]
-    fn span(&self) -> Span {
-        self.span
-    }
-}
 
 impl From<Spanning<&str>> for syn::LitStr {
     fn from(s: Spanning<&str>) -> Self {

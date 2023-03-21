@@ -17,10 +17,10 @@ include = ["/src/", "/Cargo.toml", "/README.md"]
 proc-macro = true
 
 [dependencies]
-syn = { version = "1.0.72", features = ["parsing", "proc-macro"], default-features = false }
+syn = { version = "2.0", features = ["parsing", "proc-macro"], default-features = false }
 synthez-core = { version = "0.2", path = "../core" }
 
 [dev-dependencies]
 proc-macro2 = { version = "1.0.4", default-features = false }
-syn = { version = "1.0.72", features = ["derive", "parsing", "proc-macro"], default-features = false }
+syn = { version = "2.0", features = ["derive", "parsing", "proc-macro"], default-features = false }
 synthez = { path = "..", features = ["full"] }

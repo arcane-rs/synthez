@@ -82,7 +82,7 @@ struct Definition {
 }
 
 impl Definition {
-    /// Generates implementation of [`syn::parse::Parse`] trait for this struct.
+    /// Generates implementation of [`Parse`] trait for this struct.
     #[must_use]
     fn impl_syn_parse(&self) -> TokenStream {
         let parse_arms = self.fields.iter().map(|f| {
@@ -387,7 +387,7 @@ impl Field {
                 ::synthez::parse::Attrs::validate(
                     &**v,
                     &format!(#attr_fmt, attr_name),
-                    ::synthez::syn::spanned::Spanned::span(v),
+                    ::synthez::spanned::IntoSpan::into_span(v),
                 )?;
             }
         })

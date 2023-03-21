@@ -17,25 +17,32 @@ pub fn doc_string(
     let mut out = String::new();
 
     for a in super::attrs::filter_by_name("doc", attrs) {
-        if let syn::Meta::NameValue(item) = a.parse_meta()? {
-            if let syn::Lit::Str(lit) = item.lit {
-                if span.is_none() {
-                    span = Some(lit.span());
-                }
+        if let syn::Meta::NameValue(item) = &a.meta {
+            if let syn::Expr::Lit(expr) = &item.value {
+                if let syn::Lit::Str(lit) = &expr.lit {
+                    if span.is_none() {
+                        span = Some(lit.span());
+                    }
 
-                let s = lit.value();
-                let s = s.strip_prefix(' ').unwrap_or(&s).trim_end();
-                if s.ends_with('\\') {
-                    out.push_str(s.trim_end_matches('\\'));
-                    out.push(' ');
+                    let s = lit.value();
+                    let s = s.strip_prefix(' ').unwrap_or(&s).trim_end();
+                    if s.ends_with('\\') {
+                        out.push_str(s.trim_end_matches('\\'));
+                        out.push(' ');
+                    } else {
+                        out.push_str(s);
+                        out.push('\n');
+                    }
                 } else {
-                    out.push_str(s);
-                    out.push('\n');
+                    return Err(syn::Error::new_spanned(
+                        &expr.lit,
+                        "`#[doc]` attribute can contain string literals only",
+                    ));
                 }
             } else {
                 return Err(syn::Error::new_spanned(
-                    item.lit,
-                    "`#[doc]` attribute can contain string literals only",
+                    &item.value,
+                    "`#[doc]` attribute should be in `#[doc = value] format`",
                 ));
             }
         }

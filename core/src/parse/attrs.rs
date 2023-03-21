@@ -1,9 +1,9 @@
 //! Machinery for parsing [`syn::Attribute`]s into a custom defined struct.
 
 use proc_macro2::Span;
-use syn::{parse::Parse, spanned::Spanned};
+use syn::parse::Parse;
 
-use crate::has;
+use crate::{has, spanned::IntoSpan};
 
 use super::err;
 
@@ -61,7 +61,8 @@ pub trait Attrs: Default + Parse {
     ///   [`Attrs::fallback()`] fails.
     fn parse_attrs<T>(name: &str, item: &T) -> syn::Result<Self>
     where
-        T: has::Attrs + Spanned,
+        T: has::Attrs,
+        for<'a> &'a T: IntoSpan,
     {
         let attrs = item.attrs();
         filter_by_name(name, attrs)
@@ -69,7 +70,7 @@ pub trait Attrs: Default + Parse {
             .try_fold(Self::default(), |prev, curr| prev.try_merge(curr?))
             .and_then(|mut parsed| {
                 parsed.fallback(attrs)?;
-                parsed.validate(name, item.span())?;
+                parsed.validate(name, item.into_span())?;
                 Ok(parsed)
             })
     }
@@ -90,7 +91,8 @@ impl<V: Attrs + Default + Parse> Attrs for Box<V> {
 
     fn parse_attrs<T>(name: &str, item: &T) -> syn::Result<Self>
     where
-        T: has::Attrs + Spanned,
+        T: has::Attrs,
+        for<'a> &'a T: IntoSpan,
     {
         V::parse_attrs(name, item).map(Self::new)
     }
@@ -102,7 +104,7 @@ pub fn filter_by_name<'n: 'ret, 'a: 'ret, 'ret>(
     name: &'n str,
     attrs: &'a [syn::Attribute],
 ) -> impl Iterator<Item = &'a syn::Attribute> + 'ret {
-    attrs.iter().filter(move |attr| path_eq_single(&attr.path, name))
+    attrs.iter().filter(move |attr| path_eq_single(attr.meta.path(), name))
 }
 
 /// Compares the given `path` with the one-segment string `value` to be equal.
@@ -155,9 +157,7 @@ pub mod field {
     mod option {
         //! [`TryApply`] impls for [`Option`].
 
-        use syn::spanned::Spanned;
-
-        use crate::field::Container as _;
+        use crate::{field::Container as _, spanned::IntoSpan};
 
         use super::{
             super::{dedup, err, kind, Dedup, Kind},
@@ -166,7 +166,7 @@ pub mod field {
 
         impl<V, K> TryApply<V, K, dedup::Unique> for Option<V>
         where
-            V: Spanned,
+            for<'a> &'a V: IntoSpan,
             K: Kind + kind::Single + ?Sized,
         {
             fn try_apply(&mut self, val: V) -> syn::Result<()> {
@@ -202,7 +202,6 @@ pub mod field {
 
         impl<V, K, D> TryApplySelf<V, K, D> for Option<V>
         where
-            V: Spanned,
             K: Kind + kind::Single + ?Sized,
             D: Dedup + ?Sized,
             Self: TryApply<V, K, D>,
@@ -219,9 +218,7 @@ pub mod field {
     mod required {
         //! [`TryApply`] impls for [`Required`].
 
-        use syn::spanned::Spanned;
-
-        use crate::{field::Container as _, Required};
+        use crate::{field::Container as _, spanned::IntoSpan, Required};
 
         use super::{
             super::{dedup, err, kind, Dedup, Kind},
@@ -230,7 +227,7 @@ pub mod field {
 
         impl<V, K> TryApply<V, K, dedup::Unique> for Required<V>
         where
-            V: Spanned,
+            for<'a> &'a V: IntoSpan,
             K: Kind + kind::Single + ?Sized,
         {
             fn try_apply(&mut self, val: V) -> syn::Result<()> {
@@ -266,7 +263,6 @@ pub mod field {
 
         impl<V, K, D> TryApplySelf<V, K, D> for Required<V>
         where
-            V: Spanned,
             K: Kind + kind::Single + ?Sized,
             D: Dedup + ?Sized,
             Self: TryApply<V, K, D>,
@@ -283,9 +279,7 @@ pub mod field {
     mod vec {
         //! [`TryApply`] impls for [`Vec`].
 
-        use syn::spanned::Spanned;
-
-        use crate::field::Container as _;
+        use crate::{field::Container as _, spanned::IntoSpan};
 
         use super::{
             super::{dedup, err, kind, Dedup},
@@ -294,7 +288,8 @@ pub mod field {
 
         impl<V> TryApply<V, kind::Nested, dedup::Unique> for Vec<V>
         where
-            V: Spanned + PartialEq,
+            for<'a> &'a V: IntoSpan,
+            V: PartialEq,
         {
             fn try_apply(&mut self, val: V) -> syn::Result<()> {
                 if self.has(&val) {
@@ -323,7 +318,6 @@ pub mod field {
 
         impl<V, D> TryApplySelf<V, kind::Nested, D> for Vec<V>
         where
-            V: Spanned + PartialEq,
             D: Dedup + ?Sized,
             Self: TryApply<V, kind::Nested, D>,
         {
@@ -337,7 +331,8 @@ pub mod field {
 
         impl<V> TryApply<V, kind::Value, dedup::Unique> for Vec<V>
         where
-            V: Spanned + PartialEq,
+            for<'a> &'a V: IntoSpan,
+            V: PartialEq,
         {
             fn try_apply(&mut self, val: V) -> syn::Result<()> {
                 if self.has(&val) {
@@ -366,7 +361,6 @@ pub mod field {
 
         impl<V, D> TryApplySelf<V, kind::Value, D> for Vec<V>
         where
-            V: Spanned + PartialEq,
             D: Dedup + ?Sized,
             Self: TryApply<V, kind::Value, D>,
         {
@@ -387,9 +381,7 @@ pub mod field {
             hash::{BuildHasher, Hash},
         };
 
-        use syn::spanned::Spanned;
-
-        use crate::field::Container as _;
+        use crate::{field::Container as _, spanned::IntoSpan};
 
         use super::{
             super::{dedup, err, kind, Dedup},
@@ -398,7 +390,8 @@ pub mod field {
 
         impl<V, S> TryApply<V, kind::Nested, dedup::Unique> for HashSet<V, S>
         where
-            V: Spanned + Eq + Hash,
+            for<'a> &'a V: IntoSpan,
+            V: Eq + Hash,
             S: BuildHasher,
         {
             fn try_apply(&mut self, val: V) -> syn::Result<()> {
@@ -436,7 +429,6 @@ pub mod field {
 
         impl<V, S, D> TryApplySelf<V, kind::Nested, D> for HashSet<V, S>
         where
-            V: Spanned + Eq + Hash,
             D: Dedup + ?Sized,
             S: BuildHasher,
             Self: TryApply<V, kind::Nested, D>,
@@ -451,7 +443,8 @@ pub mod field {
 
         impl<V, S> TryApply<V, kind::Value, dedup::Unique> for HashSet<V, S>
         where
-            V: Spanned + Eq + Hash,
+            for<'a> &'a V: IntoSpan,
+            V: Eq + Hash,
             S: BuildHasher,
         {
             fn try_apply(&mut self, val: V) -> syn::Result<()> {
@@ -489,7 +482,6 @@ pub mod field {
 
         impl<V, S, D> TryApplySelf<V, kind::Value, D> for HashSet<V, S>
         where
-            V: Spanned + Eq + Hash,
             D: Dedup + ?Sized,
             S: BuildHasher,
             Self: TryApply<V, kind::Value, D>,
@@ -508,9 +500,7 @@ pub mod field {
 
         use std::collections::BTreeSet;
 
-        use syn::spanned::Spanned;
-
-        use crate::field::Container as _;
+        use crate::{field::Container as _, spanned::IntoSpan};
 
         use super::{
             super::{dedup, err, kind, Dedup},
@@ -519,7 +509,8 @@ pub mod field {
 
         impl<V> TryApply<V, kind::Nested, dedup::Unique> for BTreeSet<V>
         where
-            V: Spanned + Ord,
+            for<'a> &'a V: IntoSpan,
+            V: Ord,
         {
             fn try_apply(&mut self, val: V) -> syn::Result<()> {
                 if self.has(&val) {
@@ -548,7 +539,6 @@ pub mod field {
 
         impl<V, D> TryApplySelf<V, kind::Nested, D> for BTreeSet<V>
         where
-            V: Spanned + Ord,
             D: Dedup + ?Sized,
             Self: TryApply<V, kind::Nested, D>,
         {
@@ -562,7 +552,8 @@ pub mod field {
 
         impl<V> TryApply<V, kind::Value, dedup::Unique> for BTreeSet<V>
         where
-            V: Spanned + Ord,
+            for<'a> &'a V: IntoSpan,
+            V: Ord,
         {
             fn try_apply(&mut self, val: V) -> syn::Result<()> {
                 if self.has(&val) {
@@ -591,7 +582,6 @@ pub mod field {
 
         impl<V, D> TryApplySelf<V, kind::Value, D> for BTreeSet<V>
         where
-            V: Spanned + Ord,
             D: Dedup + ?Sized,
             Self: TryApply<V, kind::Value, D>,
         {
@@ -612,17 +602,18 @@ pub mod field {
             hash::{BuildHasher, Hash},
         };
 
-        use syn::spanned::Spanned;
-
-        use crate::field::Container as _;
+        use crate::{field::Container as _, spanned::IntoSpan};
 
         use super::{
             super::{dedup, err, kind, Dedup},
             TryApply, TryApplySelf,
         };
 
-        impl<K: Spanned + Eq + Hash, V, S: BuildHasher>
-            TryApply<(K, V), kind::Map, dedup::Unique> for HashMap<K, V, S>
+        impl<K, V, S: BuildHasher> TryApply<(K, V), kind::Map, dedup::Unique>
+            for HashMap<K, V, S>
+        where
+            for<'a> &'a K: IntoSpan,
+            K: Eq + Hash,
         {
             fn try_apply(&mut self, val: (K, V)) -> syn::Result<()> {
                 if self.has(&val) {
@@ -655,7 +646,6 @@ pub mod field {
 
         impl<K, V, D, S> TryApplySelf<(K, V), kind::Map, D> for HashMap<K, V, S>
         where
-            K: Spanned + Eq + Hash,
             D: Dedup + ?Sized,
             S: BuildHasher,
             Self: TryApply<(K, V), kind::Map, D>,
@@ -674,9 +664,7 @@ pub mod field {
 
         use std::collections::BTreeMap;
 
-        use syn::spanned::Spanned;
-
-        use crate::field::Container as _;
+        use crate::{field::Container as _, spanned::IntoSpan};
 
         use super::{
             super::{dedup, err, kind, Dedup},
@@ -685,7 +673,8 @@ pub mod field {
 
         impl<K, V> TryApply<(K, V), kind::Map, dedup::Unique> for BTreeMap<K, V>
         where
-            K: Spanned + Ord,
+            for<'a> &'a K: IntoSpan,
+            K: Ord,
         {
             fn try_apply(&mut self, val: (K, V)) -> syn::Result<()> {
                 if self.has(&val) {
@@ -720,7 +709,6 @@ pub mod field {
 
         impl<K, V, D> TryApplySelf<(K, V), kind::Map, D> for BTreeMap<K, V>
         where
-            K: Spanned + Ord,
             D: Dedup + ?Sized,
             Self: TryApply<(K, V), kind::Map, D>,
         {
