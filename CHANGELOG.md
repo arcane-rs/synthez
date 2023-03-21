@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.3.0] · 2023-03-??
+## [0.3.0] · 2023-03-21
 [0.3.0]: /../../tree/v0.3.0
 
 [Diff](/../../compare/v0.2.0...v0.3.0)
@@ -14,7 +14,10 @@ All user visible changes to this project will be documented in this file. This p
 ### BC Breaks
 
 - Set MSRV to [1.62.0](https://blog.rust-lang.org/2022/06/30/Rust-1.62.0.html). ([7f0b77e0])
-- Upgrade [`syn`] to 2.0 version. ([todo])
+- Upgrade [`syn`] to 2.0 version. ([90159de5])
+
+[7f0b77e0]: /../../commit/7f0b77e0842edd7ecd18c91ec1e1b218711cc230
+[90159de5]: /../../commit/90159de521e71c0d0cffbdb38dcb21e9ffe84227
 
 
 
