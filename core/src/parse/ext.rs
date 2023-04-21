@@ -138,11 +138,11 @@ impl<'buf> ParseBuffer for syn::parse::ParseBuffer<'buf> {
     {
         let inner;
         if TypeId::of::<W>() == TypeId::of::<token::Bracket>() {
-            let _ = syn::bracketed!(inner in self);
+            _ = syn::bracketed!(inner in self);
         } else if TypeId::of::<W>() == TypeId::of::<token::Brace>() {
-            let _ = syn::braced!(inner in self);
+            _ = syn::braced!(inner in self);
         } else if TypeId::of::<W>() == TypeId::of::<token::Paren>() {
-            let _ = syn::parenthesized!(inner in self);
+            _ = syn::parenthesized!(inner in self);
         } else {
             return Err(syn::Error::new(
                 Span::call_site(),
@@ -179,7 +179,7 @@ impl<'buf> ParseBuffer for syn::parse::ParseBuffer<'buf> {
         Ok(if self.is_next::<W>() {
             self.parse_wrapped_and_punctuated::<T, W, P>()?
         } else {
-            let _ = self.parse::<token::Eq>()?;
+            _ = self.parse::<token::Eq>()?;
             iter::once(self.parse::<T>()?).collect()
         })
     }

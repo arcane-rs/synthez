@@ -587,7 +587,7 @@ impl Parse for Spanning<Kind> {
                 "value" => {
                     if input.is_next::<token::Paren>() {
                         let inner;
-                        let _ = syn::parenthesized!(inner in input);
+                        _ = syn::parenthesized!(inner in input);
                         let inner = inner.parse::<syn::Ident>()?;
                         let val = inner.to_string();
                         if val != "spaced" {
