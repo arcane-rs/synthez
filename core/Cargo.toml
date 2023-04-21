@@ -26,7 +26,7 @@ full = ["syn/full"]
 [dependencies]
 proc-macro2 = { version = "1.0.4", default-features = false }
 quote = { version = "1.0.9", default-features = false }
-sealed = { version = "0.4", default-features = false }
+sealed = { version = "0.5", default-features = false }
 syn = { version = "2.0", features = ["clone-impls", "derive", "extra-traits", "parsing", "printing"], default-features = false }
 
 [dev-dependencies]
