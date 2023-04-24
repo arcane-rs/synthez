@@ -1,6 +1,6 @@
 [package]
 name = "synthez"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 rust-version = "1.62"
 description = "Steroids for `syn`, `quote` and `proc-macro2` crates."
@@ -28,8 +28,8 @@ rustdoc-args = ["--cfg", "docsrs"]
 full = ["syn/full", "synthez-core/full"]
 
 [dependencies]
-synthez-codegen = { version = "0.3", path = "./codegen" }
-synthez-core = { version = "0.3", path = "./core" }
+synthez-codegen = { version = "0.3.1", path = "./codegen" }
+synthez-core = { version = "0.3.1", path = "./core" }
 
 # Repeats the one from `synthez-core` crate.
 # For correct Rust docs rendering only!

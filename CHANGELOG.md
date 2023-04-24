@@ -6,6 +6,20 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.3.1] · 2023-03-24
+[0.3.1]: /../../tree/v0.3.1
+
+[Diff](/../../compare/v0.3.0...v0.3.1)
+
+### Changed
+
+- Upgraded [`sealed`] to 0.5 version to fully get rid of [`syn`] 1.0. ([147baf04])
+
+[147baf04]: /../../commit/147baf047ff840776346048afdafe77ccb94486b
+
+
+
+
 ## [0.3.0] · 2023-03-21
 [0.3.0]: /../../tree/v0.3.0
 
@@ -106,6 +120,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+[`sealed`]: https://docs.rs/sealed
 [`syn`]: https://docs.rs/syn
 
 [Semantic Versioning 2.0.0]: https://semver.org
