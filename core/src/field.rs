@@ -250,6 +250,20 @@ impl<T> Required<T> {
         #[allow(clippy::expect_used)]
         self.0.expect("Uninitialized `Required` value")
     }
+
+    /// Returns an [`Iterator`] over a value referenced by this [`Required`]
+    /// [`Container`].
+    #[must_use]
+    pub fn iter(&self) -> <&Self as IntoIterator>::IntoIter {
+        self.into_iter()
+    }
+
+    /// Returns an [`Iterator`] over a value mutably referenced by this
+    /// [`Required`] [`Container`].
+    #[must_use]
+    pub fn iter_mut(&mut self) -> <&mut Self as IntoIterator>::IntoIter {
+        self.into_iter()
+    }
 }
 
 impl<T> Deref for Required<T> {
