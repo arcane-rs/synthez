@@ -434,6 +434,7 @@ pub mod field {
             Self: TryApply<V, kind::Nested, D>,
         {
             fn try_apply_self(&mut self, another: Self) -> syn::Result<()> {
+                #[allow(clippy::iter_over_hash_type)] // order doesn't matter
                 for val in another {
                     self.try_apply(val)?;
                 }
@@ -487,6 +488,7 @@ pub mod field {
             Self: TryApply<V, kind::Value, D>,
         {
             fn try_apply_self(&mut self, another: Self) -> syn::Result<()> {
+                #[allow(clippy::iter_over_hash_type)] // order doesn't matter
                 for val in another {
                     self.try_apply(val)?;
                 }
@@ -651,6 +653,7 @@ pub mod field {
             Self: TryApply<(K, V), kind::Map, D>,
         {
             fn try_apply_self(&mut self, another: Self) -> syn::Result<()> {
+                #[allow(clippy::iter_over_hash_type)] // order doesn't matter
                 for val in another {
                     self.try_apply(val)?;
                 }
