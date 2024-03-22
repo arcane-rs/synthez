@@ -115,7 +115,7 @@ pub trait ParseBuffer {
 }
 
 #[sealed]
-impl<'buf> ParseBuffer for syn::parse::ParseBuffer<'buf> {
+impl ParseBuffer for syn::parse::ParseBuffer<'_> {
     fn try_parse<T: Default + Parse + Token>(&self) -> syn::Result<Option<T>> {
         self.is_next::<T>().then(|| self.parse()).transpose()
     }

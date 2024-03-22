@@ -100,6 +100,7 @@ impl<V: Attrs + Default + Parse> Attrs for Box<V> {
 
 /// Filters the given `attrs` to contain [`syn::Attribute`]s only with the given
 /// `name`.
+#[allow(single_use_lifetimes)] // no other way
 pub fn filter_by_name<'n: 'ret, 'a: 'ret, 'ret>(
     name: &'n str,
     attrs: &'a [syn::Attribute],

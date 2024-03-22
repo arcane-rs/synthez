@@ -1,9 +1,6 @@
 //! Batteries for [`Span`] and [`syn::spanned`].
 
-use std::{
-    cmp::{Eq, PartialEq},
-    ops::{Deref, DerefMut},
-};
+use std::ops::{Deref, DerefMut};
 
 use proc_macro2::Span;
 use sealed::sealed;
@@ -61,8 +58,6 @@ impl<T> Spanning<T> {
     }
 
     /// Destructures this [`Spanning`] wrapper returning the underlying value.
-    // false positive: constant functions cannot evaluate destructors
-    #[allow(clippy::missing_const_for_fn)]
     #[must_use]
     pub fn into_inner(self) -> T {
         self.item

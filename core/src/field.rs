@@ -248,7 +248,7 @@ impl<T> Required<T> {
     #[must_use]
     pub fn into_inner(self) -> T {
         #[allow(clippy::expect_used)]
-        self.0.expect("Uninitialized `Required` value")
+        self.0.expect("uninitialized `Required` value")
     }
 
     /// Returns an [`Iterator`] over a value referenced by this [`Required`]
@@ -271,14 +271,14 @@ impl<T> Deref for Required<T> {
 
     fn deref(&self) -> &Self::Target {
         #[allow(clippy::expect_used)]
-        self.0.as_ref().expect("Uninitialized `Required` value")
+        self.0.as_ref().expect("uninitialized `Required` value")
     }
 }
 
 impl<T> DerefMut for Required<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         #[allow(clippy::expect_used)]
-        self.0.as_mut().expect("Uninitialized `Required` value")
+        self.0.as_mut().expect("uninitialized `Required` value")
     }
 }
 
