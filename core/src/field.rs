@@ -247,7 +247,7 @@ impl<T> Required<T> {
     /// value.
     #[must_use]
     pub fn into_inner(self) -> T {
-        #[allow(clippy::expect_used)]
+        #[allow(clippy::expect_used)] // intentional
         self.0.expect("uninitialized `Required` value")
     }
 
@@ -270,14 +270,14 @@ impl<T> Deref for Required<T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
-        #[allow(clippy::expect_used)]
+        #[allow(clippy::expect_used)] // intentional
         self.0.as_ref().expect("uninitialized `Required` value")
     }
 }
 
 impl<T> DerefMut for Required<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        #[allow(clippy::expect_used)]
+        #[allow(clippy::expect_used)] // intentional
         self.0.as_mut().expect("uninitialized `Required` value")
     }
 }
