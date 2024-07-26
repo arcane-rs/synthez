@@ -615,7 +615,7 @@ impl Parse for Spanning<Kind> {
 }
 
 impl ToTokens for Kind {
-    fn to_tokens(&self, out: &mut TokenStream) {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         let variant = syn::Ident::new_on_call_site(match self {
             Self::Ident => "Ident",
             Self::Nested => "Nested",
@@ -625,7 +625,7 @@ impl ToTokens for Kind {
         (quote! {
             ::synthez::parse::attrs::kind::#variant
         })
-        .to_tokens(out);
+        .to_tokens(tokens);
     }
 }
 
@@ -664,7 +664,7 @@ impl Parse for Spanning<Dedup> {
 }
 
 impl ToTokens for Dedup {
-    fn to_tokens(&self, out: &mut TokenStream) {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         let variant = syn::Ident::new_on_call_site(match self {
             Self::Unique => "Unique",
             Self::First => "First",
@@ -673,6 +673,6 @@ impl ToTokens for Dedup {
         (quote! {
             ::synthez::parse::attrs::dedup::#variant
         })
-        .to_tokens(out);
+        .to_tokens(tokens);
     }
 }

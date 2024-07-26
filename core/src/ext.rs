@@ -165,7 +165,7 @@ pub trait Ident {
 #[sealed]
 impl Ident for syn::Ident {
     #[inline]
-    fn new_on_call_site(string: &str) -> Self {
-        Self::new(string, Span::call_site())
+    fn new_on_call_site(ident: &str) -> Self {
+        Self::new(ident, Span::call_site())
     }
 }

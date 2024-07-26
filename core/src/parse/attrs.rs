@@ -170,11 +170,11 @@ pub mod field {
             for<'a> &'a V: IntoSpan,
             K: Kind + kind::Single + ?Sized,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if self.has(&val) {
-                    return Err(err::dup_attr_arg(&val));
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if self.has(&value) {
+                    return Err(err::dup_attr_arg(&value));
                 }
-                self.set(val);
+                self.set(value);
                 Ok(())
             }
         }
@@ -183,9 +183,9 @@ pub mod field {
         where
             K: Kind + kind::Single + ?Sized,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if !self.has(&val) {
-                    self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if !self.has(&value) {
+                    self.set(value);
                 }
                 Ok(())
             }
@@ -195,8 +195,8 @@ pub mod field {
         where
             K: Kind + kind::Single + ?Sized,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                self.set(value);
                 Ok(())
             }
         }
@@ -231,11 +231,11 @@ pub mod field {
             for<'a> &'a V: IntoSpan,
             K: Kind + kind::Single + ?Sized,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if self.has(&val) {
-                    return Err(err::dup_attr_arg(&val));
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if self.has(&value) {
+                    return Err(err::dup_attr_arg(&value));
                 }
-                self.set(val);
+                self.set(value);
                 Ok(())
             }
         }
@@ -244,9 +244,9 @@ pub mod field {
         where
             K: Kind + kind::Single + ?Sized,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if !self.has(&val) {
-                    self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if !self.has(&value) {
+                    self.set(value);
                 }
                 Ok(())
             }
@@ -256,8 +256,8 @@ pub mod field {
         where
             K: Kind + kind::Single + ?Sized,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                self.set(value);
                 Ok(())
             }
         }
@@ -292,27 +292,27 @@ pub mod field {
             for<'a> &'a V: IntoSpan,
             V: PartialEq,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if self.has(&val) {
-                    return Err(err::dup_attr_arg(&val));
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if self.has(&value) {
+                    return Err(err::dup_attr_arg(&value));
                 }
-                self.set(val);
+                self.set(value);
                 Ok(())
             }
         }
 
         impl<V: PartialEq> TryApply<V, kind::Nested, dedup::First> for Vec<V> {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if !self.has(&val) {
-                    self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if !self.has(&value) {
+                    self.set(value);
                 }
                 Ok(())
             }
         }
 
         impl<V: PartialEq> TryApply<V, kind::Nested, dedup::Last> for Vec<V> {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                self.set(value);
                 Ok(())
             }
         }
@@ -335,27 +335,27 @@ pub mod field {
             for<'a> &'a V: IntoSpan,
             V: PartialEq,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if self.has(&val) {
-                    return Err(err::dup_attr_arg(&val));
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if self.has(&value) {
+                    return Err(err::dup_attr_arg(&value));
                 }
-                self.set(val);
+                self.set(value);
                 Ok(())
             }
         }
 
         impl<V: PartialEq> TryApply<V, kind::Value, dedup::First> for Vec<V> {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if !self.has(&val) {
-                    self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if !self.has(&value) {
+                    self.set(value);
                 }
                 Ok(())
             }
         }
 
         impl<V: PartialEq> TryApply<V, kind::Value, dedup::Last> for Vec<V> {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                self.set(value);
                 Ok(())
             }
         }
@@ -395,11 +395,11 @@ pub mod field {
             V: Eq + Hash,
             S: BuildHasher,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if self.has(&val) {
-                    return Err(err::dup_attr_arg(&val));
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if self.has(&value) {
+                    return Err(err::dup_attr_arg(&value));
                 }
-                self.set(val);
+                self.set(value);
                 Ok(())
             }
         }
@@ -409,9 +409,9 @@ pub mod field {
             V: Eq + Hash,
             S: BuildHasher,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if !self.has(&val) {
-                    self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if !self.has(&value) {
+                    self.set(value);
                 }
                 Ok(())
             }
@@ -422,8 +422,8 @@ pub mod field {
             V: Eq + Hash,
             S: BuildHasher,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                self.set(value);
                 Ok(())
             }
         }
@@ -449,11 +449,11 @@ pub mod field {
             V: Eq + Hash,
             S: BuildHasher,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if self.has(&val) {
-                    return Err(err::dup_attr_arg(&val));
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if self.has(&value) {
+                    return Err(err::dup_attr_arg(&value));
                 }
-                self.set(val);
+                self.set(value);
                 Ok(())
             }
         }
@@ -463,9 +463,9 @@ pub mod field {
             V: Eq + Hash,
             S: BuildHasher,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if !self.has(&val) {
-                    self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if !self.has(&value) {
+                    self.set(value);
                 }
                 Ok(())
             }
@@ -476,8 +476,8 @@ pub mod field {
             V: Eq + Hash,
             S: BuildHasher,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                self.set(value);
                 Ok(())
             }
         }
@@ -515,27 +515,27 @@ pub mod field {
             for<'a> &'a V: IntoSpan,
             V: Ord,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if self.has(&val) {
-                    return Err(err::dup_attr_arg(&val));
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if self.has(&value) {
+                    return Err(err::dup_attr_arg(&value));
                 }
-                self.set(val);
+                self.set(value);
                 Ok(())
             }
         }
 
         impl<V: Ord> TryApply<V, kind::Nested, dedup::First> for BTreeSet<V> {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if !self.has(&val) {
-                    self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if !self.has(&value) {
+                    self.set(value);
                 }
                 Ok(())
             }
         }
 
         impl<V: Ord> TryApply<V, kind::Nested, dedup::Last> for BTreeSet<V> {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                self.set(value);
                 Ok(())
             }
         }
@@ -558,27 +558,27 @@ pub mod field {
             for<'a> &'a V: IntoSpan,
             V: Ord,
         {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if self.has(&val) {
-                    return Err(err::dup_attr_arg(&val));
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if self.has(&value) {
+                    return Err(err::dup_attr_arg(&value));
                 }
-                self.set(val);
+                self.set(value);
                 Ok(())
             }
         }
 
         impl<V: Ord> TryApply<V, kind::Value, dedup::First> for BTreeSet<V> {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                if !self.has(&val) {
-                    self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                if !self.has(&value) {
+                    self.set(value);
                 }
                 Ok(())
             }
         }
 
         impl<V: Ord> TryApply<V, kind::Value, dedup::Last> for BTreeSet<V> {
-            fn try_apply(&mut self, val: V) -> syn::Result<()> {
-                self.set(val);
+            fn try_apply(&mut self, value: V) -> syn::Result<()> {
+                self.set(value);
                 Ok(())
             }
         }
@@ -618,11 +618,11 @@ pub mod field {
             for<'a> &'a K: IntoSpan,
             K: Eq + Hash,
         {
-            fn try_apply(&mut self, val: (K, V)) -> syn::Result<()> {
-                if self.has(&val) {
-                    return Err(err::dup_attr_arg(&val.0));
+            fn try_apply(&mut self, value: (K, V)) -> syn::Result<()> {
+                if self.has(&value) {
+                    return Err(err::dup_attr_arg(&value.0));
                 }
-                self.set(val);
+                self.set(value);
                 Ok(())
             }
         }
@@ -630,9 +630,9 @@ pub mod field {
         impl<K: Eq + Hash, V, S: BuildHasher>
             TryApply<(K, V), kind::Map, dedup::First> for HashMap<K, V, S>
         {
-            fn try_apply(&mut self, val: (K, V)) -> syn::Result<()> {
-                if !self.has(&val) {
-                    self.set(val);
+            fn try_apply(&mut self, value: (K, V)) -> syn::Result<()> {
+                if !self.has(&value) {
+                    self.set(value);
                 }
                 Ok(())
             }
@@ -641,8 +641,8 @@ pub mod field {
         impl<K: Eq + Hash, V, S: BuildHasher>
             TryApply<(K, V), kind::Map, dedup::Last> for HashMap<K, V, S>
         {
-            fn try_apply(&mut self, val: (K, V)) -> syn::Result<()> {
-                self.set(val);
+            fn try_apply(&mut self, value: (K, V)) -> syn::Result<()> {
+                self.set(value);
                 Ok(())
             }
         }
@@ -680,11 +680,11 @@ pub mod field {
             for<'a> &'a K: IntoSpan,
             K: Ord,
         {
-            fn try_apply(&mut self, val: (K, V)) -> syn::Result<()> {
-                if self.has(&val) {
-                    return Err(err::dup_attr_arg(&val.0));
+            fn try_apply(&mut self, value: (K, V)) -> syn::Result<()> {
+                if self.has(&value) {
+                    return Err(err::dup_attr_arg(&value.0));
                 }
-                self.set(val);
+                self.set(value);
                 Ok(())
             }
         }
@@ -693,9 +693,9 @@ pub mod field {
         where
             K: Ord,
         {
-            fn try_apply(&mut self, val: (K, V)) -> syn::Result<()> {
-                if !self.has(&val) {
-                    self.set(val);
+            fn try_apply(&mut self, value: (K, V)) -> syn::Result<()> {
+                if !self.has(&value) {
+                    self.set(value);
                 }
                 Ok(())
             }
@@ -705,8 +705,8 @@ pub mod field {
         where
             K: Ord,
         {
-            fn try_apply(&mut self, val: (K, V)) -> syn::Result<()> {
-                self.set(val);
+            fn try_apply(&mut self, value: (K, V)) -> syn::Result<()> {
+                self.set(value);
                 Ok(())
             }
         }
@@ -760,13 +760,13 @@ pub mod field {
 
     #[sealed]
     impl<T: ?Sized, V> TryMerge<V> for T {
-        fn try_merge<K, D>(&mut self, val: V) -> syn::Result<()>
+        fn try_merge<K, D>(&mut self, value: V) -> syn::Result<()>
         where
             Self: TryApply<V, K, D>,
             K: Kind + ?Sized,
             D: Dedup + ?Sized,
         {
-            <Self as TryApply<V, K, D>>::try_apply(self, val)
+            <Self as TryApply<V, K, D>>::try_apply(self, value)
         }
 
         fn try_merge_self<K, D>(&mut self, another: Self) -> syn::Result<()>

@@ -79,8 +79,8 @@ impl<V> Container<V> for Option<V> {
         self.is_some()
     }
 
-    fn replace(&mut self, val: V) -> Self {
-        Self::replace(self, val)
+    fn replace(&mut self, value: V) -> Self {
+        Self::replace(self, value)
     }
 }
 
@@ -95,8 +95,8 @@ impl<V> Container<V> for Required<V> {
         self.is_present()
     }
 
-    fn replace(&mut self, val: V) -> Option<V> {
-        Self::replace_with(self, val)
+    fn replace(&mut self, value: V) -> Option<V> {
+        Self::replace_with(self, value)
     }
 }
 
@@ -107,15 +107,15 @@ impl<V: PartialEq> Container<V> for Vec<V> {
         Self::is_empty(self)
     }
 
-    fn has(&self, val: &V) -> bool {
-        self.contains(val)
+    fn has(&self, value: &V) -> bool {
+        self.contains(value)
     }
 
-    fn replace(&mut self, val: V) -> Option<V> {
-        if let Some(old) = self.iter_mut().find(|v| *v == &val) {
-            Some(mem::replace(old, val))
+    fn replace(&mut self, value: V) -> Option<V> {
+        if let Some(old) = self.iter_mut().find(|v| *v == &value) {
+            Some(mem::replace(old, value))
         } else {
-            self.push(val);
+            self.push(value);
             None
         }
     }
@@ -132,12 +132,12 @@ where
         Self::is_empty(self)
     }
 
-    fn has(&self, val: &V) -> bool {
-        self.contains(val)
+    fn has(&self, value: &V) -> bool {
+        self.contains(value)
     }
 
-    fn replace(&mut self, val: V) -> Option<V> {
-        Self::replace(self, val)
+    fn replace(&mut self, value: V) -> Option<V> {
+        Self::replace(self, value)
     }
 }
 
@@ -148,12 +148,12 @@ impl<V: Ord> Container<V> for BTreeSet<V> {
         Self::is_empty(self)
     }
 
-    fn has(&self, val: &V) -> bool {
-        self.contains(val)
+    fn has(&self, value: &V) -> bool {
+        self.contains(value)
     }
 
-    fn replace(&mut self, val: V) -> Option<V> {
-        Self::replace(self, val)
+    fn replace(&mut self, value: V) -> Option<V> {
+        Self::replace(self, value)
     }
 }
 
@@ -168,13 +168,13 @@ where
         Self::is_empty(self)
     }
 
-    fn has(&self, val: &(K, V)) -> bool {
-        self.contains_key(&val.0)
+    fn has(&self, value: &(K, V)) -> bool {
+        self.contains_key(&value.0)
     }
 
-    fn replace(&mut self, val: (K, V)) -> Option<(K, V)> {
-        let prev = self.remove_entry(&val.0);
-        drop(self.insert(val.0, val.1));
+    fn replace(&mut self, value: (K, V)) -> Option<(K, V)> {
+        let prev = self.remove_entry(&value.0);
+        drop(self.insert(value.0, value.1));
         prev
     }
 }
@@ -186,13 +186,13 @@ impl<K: Ord, V> Container<(K, V)> for BTreeMap<K, V> {
         Self::is_empty(self)
     }
 
-    fn has(&self, val: &(K, V)) -> bool {
-        self.contains_key(&val.0)
+    fn has(&self, value: &(K, V)) -> bool {
+        self.contains_key(&value.0)
     }
 
-    fn replace(&mut self, val: (K, V)) -> Option<(K, V)> {
-        let prev = self.remove_entry(&val.0);
-        drop(self.insert(val.0, val.1));
+    fn replace(&mut self, value: (K, V)) -> Option<(K, V)> {
+        let prev = self.remove_entry(&value.0);
+        drop(self.insert(value.0, value.1));
         prev
     }
 }
