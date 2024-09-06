@@ -2,7 +2,7 @@
 name = "synthez-core"
 version = "0.3.1"
 edition = "2021"
-rust-version = "1.62"
+rust-version = "1.81"
 description = "Internal implementations of `synthez` crate."
 authors = ["Kai Ren <tyranron@gmail.com>"]
 license = "BlueOak-1.0.0"

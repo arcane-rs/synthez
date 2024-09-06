@@ -6,6 +6,20 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.4.0] · 202?-??-??
+[0.4.0]: /../../tree/v0.4.0
+
+[Diff](/../../compare/v0.3.1...v0.4.0)
+
+### BC Breaks
+
+- Bumped up [MSRV] to 1.81 because for `#[expect]` attribute usage. ([todo])
+
+[todo]: /../../commit/todo
+
+
+
+
 ## [0.3.1] · 2023-03-24
 [0.3.1]: /../../tree/v0.3.1
 
@@ -27,7 +41,7 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- Set MSRV to [1.62.0](https://blog.rust-lang.org/2022/06/30/Rust-1.62.0.html). ([7f0b77e0])
+- Set [MSRV] to [1.62.0](https://blog.rust-lang.org/2022/06/30/Rust-1.62.0.html). ([7f0b77e0])
 - Upgrade [`syn`] to 2.0 version. ([90159de5])
 
 [7f0b77e0]: /../../commit/7f0b77e0842edd7ecd18c91ec1e1b218711cc230
@@ -122,5 +136,5 @@ All user visible changes to this project will be documented in this file. This p
 
 [`sealed`]: https://docs.rs/sealed
 [`syn`]: https://docs.rs/syn
-
+[MSRV]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-rust-version-field
 [Semantic Versioning 2.0.0]: https://semver.org

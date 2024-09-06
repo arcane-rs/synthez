@@ -100,7 +100,7 @@ impl<V: Attrs + Default + Parse> Attrs for Box<V> {
 
 /// Filters the given `attrs` to contain [`syn::Attribute`]s only with the given
 /// `name`.
-#[allow(single_use_lifetimes)] // no other way
+#[expect(single_use_lifetimes, reason = "no other way")]
 pub fn filter_by_name<'n: 'ret, 'a: 'ret, 'ret>(
     name: &'n str,
     attrs: &'a [syn::Attribute],
@@ -435,7 +435,10 @@ pub mod field {
             Self: TryApply<V, kind::Nested, D>,
         {
             fn try_apply_self(&mut self, another: Self) -> syn::Result<()> {
-                #[allow(clippy::iter_over_hash_type)] // order doesn't matter
+                #[expect( // order doesn't matter
+                    clippy::iter_over_hash_type,
+                    reason = "order doesn't matter here"
+                )]
                 for val in another {
                     self.try_apply(val)?;
                 }
@@ -489,7 +492,10 @@ pub mod field {
             Self: TryApply<V, kind::Value, D>,
         {
             fn try_apply_self(&mut self, another: Self) -> syn::Result<()> {
-                #[allow(clippy::iter_over_hash_type)] // order doesn't matter
+                #[expect( // order doesn't matter
+                    clippy::iter_over_hash_type,
+                    reason = "order doesn't matter here"
+                )]
                 for val in another {
                     self.try_apply(val)?;
                 }
@@ -654,7 +660,10 @@ pub mod field {
             Self: TryApply<(K, V), kind::Map, D>,
         {
             fn try_apply_self(&mut self, another: Self) -> syn::Result<()> {
-                #[allow(clippy::iter_over_hash_type)] // order doesn't matter
+                #[expect( // order doesn't matter
+                    clippy::iter_over_hash_type,
+                    reason = "order doesn't matter here"
+                )]
                 for val in another {
                     self.try_apply(val)?;
                 }
