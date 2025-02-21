@@ -1,7 +1,7 @@
 #![forbid(non_ascii_idents, unsafe_code)]
 
 mod ident {
-    use synthez::{syn, IdentExt as _, ParseAttrs};
+    use synthez::{IdentExt as _, ParseAttrs, syn};
 
     mod option {
         use super::*;
@@ -135,7 +135,7 @@ mod ident {
     }
 
     mod required_fallback {
-        use synthez::{field, Required};
+        use synthez::{Required, field};
 
         use super::*;
 
@@ -480,7 +480,7 @@ mod ident {
 }
 
 mod value {
-    use synthez::{syn, IdentExt as _, ParseAttrs};
+    use synthez::{IdentExt as _, ParseAttrs, syn};
 
     mod option {
         use super::*;
@@ -677,7 +677,7 @@ mod value {
     }
 
     mod required_fallback {
-        use synthez::{field, Required};
+        use synthez::{Required, field};
 
         use super::*;
 
@@ -1164,7 +1164,7 @@ mod value {
 mod map {
     use std::collections::HashMap;
 
-    use synthez::{syn, IdentExt as _, ParseAttrs};
+    use synthez::{IdentExt as _, ParseAttrs, syn};
 
     mod hashmap {
         use super::*;
@@ -1721,7 +1721,7 @@ mod map {
 }
 
 mod nested {
-    use synthez::{syn, IdentExt as _, ParseAttrs, Spanning};
+    use synthez::{IdentExt as _, ParseAttrs, Spanning, syn};
 
     mod option {
         use super::*;

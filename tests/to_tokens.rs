@@ -1,6 +1,6 @@
 #![forbid(non_ascii_idents, unsafe_code)]
 
-use synthez::{proc_macro2::TokenStream, quote::quote, ToTokens};
+use synthez::{ToTokens, proc_macro2::TokenStream, quote::quote};
 
 #[derive(ToTokens)]
 #[to_tokens(append(impl_tokens))]

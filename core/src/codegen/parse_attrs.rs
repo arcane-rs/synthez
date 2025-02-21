@@ -3,7 +3,7 @@
 use std::{collections::BTreeSet, iter};
 
 use proc_macro2::{Span, TokenStream};
-use quote::{quote, ToTokens};
+use quote::{ToTokens, quote};
 use syn::{
     ext::IdentExt as _,
     parse::{Parse, ParseStream},
@@ -12,18 +12,18 @@ use syn::{
 };
 
 use crate::{
+    ParseAttrs, Required, Spanning,
     ext::{Data as _, Ident as _},
     parse::{
         attrs::{
             dedup,
             field::TryMerge as _,
             kind,
-            validate::{rule, Validate as _},
+            validate::{Validate as _, rule},
         },
         err,
         ext::ParseBuffer as _,
     },
-    ParseAttrs, Required, Spanning,
 };
 
 /// Name of the derived trait.

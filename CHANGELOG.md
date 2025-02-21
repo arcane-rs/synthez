@@ -13,9 +13,10 @@ All user visible changes to this project will be documented in this file. This p
 
 ### BC Breaks
 
-- Bumped up [MSRV] to 1.81 because for `#[expect]` attribute usage. ([815eee29])
+- Bumped up [MSRV] to 1.85 because for `#[expect]` attribute usage and migration to 2024 edition. ([815eee29], [todo])
 
 [815eee29]: /../../commit/815eee29d000623038f47fbc6a6a621641e8facb
+[todo]: /../../commit/todo
 
 
 

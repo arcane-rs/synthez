@@ -8,12 +8,12 @@ use syn::{
 };
 
 use crate::{
+    ParseAttrs,
     parse::{
         attrs::{dedup, field::TryMerge as _, kind},
         err,
         ext::ParseBuffer as _,
     },
-    ParseAttrs,
 };
 
 /// Name of the derived trait.

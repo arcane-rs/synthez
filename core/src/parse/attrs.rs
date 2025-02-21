@@ -3,12 +3,10 @@
 use proc_macro2::Span;
 use syn::parse::Parse;
 
-use crate::{has, spanned::IntoSpan};
-
-use super::err;
-
 #[doc(inline)]
 pub use self::{dedup::Dedup, kind::Kind, validate::Validation};
+use super::err;
+use crate::{has, spanned::IntoSpan};
 
 /// [`Parse`]ing of [`syn::Attribute`]s into a custom defined struct.
 pub trait Attrs: Default + Parse {
@@ -121,9 +119,8 @@ pub mod field {
 
     use sealed::sealed;
 
-    use crate::field;
-
     use super::{Dedup, Kind};
+    use crate::field;
 
     /// Applying a value to a [`field::Container`] according to a parsing
     /// [`Kind`] and [`Dedup`]lication strategy.
@@ -158,12 +155,11 @@ pub mod field {
     mod option {
         //! [`TryApply`] impls for [`Option`].
 
-        use crate::{field::Container as _, spanned::IntoSpan};
-
         use super::{
-            super::{dedup, err, kind, Dedup, Kind},
+            super::{Dedup, Kind, dedup, err, kind},
             TryApply, TryApplySelf,
         };
+        use crate::{field::Container as _, spanned::IntoSpan};
 
         impl<V, K> TryApply<V, K, dedup::Unique> for Option<V>
         where
@@ -219,12 +215,11 @@ pub mod field {
     mod required {
         //! [`TryApply`] impls for [`Required`].
 
-        use crate::{field::Container as _, spanned::IntoSpan, Required};
-
         use super::{
-            super::{dedup, err, kind, Dedup, Kind},
+            super::{Dedup, Kind, dedup, err, kind},
             TryApply, TryApplySelf,
         };
+        use crate::{Required, field::Container as _, spanned::IntoSpan};
 
         impl<V, K> TryApply<V, K, dedup::Unique> for Required<V>
         where
@@ -280,12 +275,11 @@ pub mod field {
     mod vec {
         //! [`TryApply`] impls for [`Vec`].
 
-        use crate::{field::Container as _, spanned::IntoSpan};
-
         use super::{
-            super::{dedup, err, kind, Dedup},
+            super::{Dedup, dedup, err, kind},
             TryApply, TryApplySelf,
         };
+        use crate::{field::Container as _, spanned::IntoSpan};
 
         impl<V> TryApply<V, kind::Nested, dedup::Unique> for Vec<V>
         where
@@ -382,12 +376,11 @@ pub mod field {
             hash::{BuildHasher, Hash},
         };
 
-        use crate::{field::Container as _, spanned::IntoSpan};
-
         use super::{
-            super::{dedup, err, kind, Dedup},
+            super::{Dedup, dedup, err, kind},
             TryApply, TryApplySelf,
         };
+        use crate::{field::Container as _, spanned::IntoSpan};
 
         impl<V, S> TryApply<V, kind::Nested, dedup::Unique> for HashSet<V, S>
         where
@@ -509,12 +502,11 @@ pub mod field {
 
         use std::collections::BTreeSet;
 
-        use crate::{field::Container as _, spanned::IntoSpan};
-
         use super::{
-            super::{dedup, err, kind, Dedup},
+            super::{Dedup, dedup, err, kind},
             TryApply, TryApplySelf,
         };
+        use crate::{field::Container as _, spanned::IntoSpan};
 
         impl<V> TryApply<V, kind::Nested, dedup::Unique> for BTreeSet<V>
         where
@@ -611,12 +603,11 @@ pub mod field {
             hash::{BuildHasher, Hash},
         };
 
-        use crate::{field::Container as _, spanned::IntoSpan};
-
         use super::{
-            super::{dedup, err, kind, Dedup},
+            super::{Dedup, dedup, err, kind},
             TryApply, TryApplySelf,
         };
+        use crate::{field::Container as _, spanned::IntoSpan};
 
         impl<K, V, S: BuildHasher> TryApply<(K, V), kind::Map, dedup::Unique>
             for HashMap<K, V, S>
@@ -677,12 +668,11 @@ pub mod field {
 
         use std::collections::BTreeMap;
 
-        use crate::{field::Container as _, spanned::IntoSpan};
-
         use super::{
-            super::{dedup, err, kind, Dedup},
+            super::{Dedup, dedup, err, kind},
             TryApply, TryApplySelf,
         };
+        use crate::{field::Container as _, spanned::IntoSpan};
 
         impl<K, V> TryApply<(K, V), kind::Map, dedup::Unique> for BTreeMap<K, V>
         where
@@ -953,7 +943,7 @@ pub mod validate {
     mod option {
         //! Implementations of [`Validation`] for [`Option`].
 
-        use super::{rule, Validation};
+        use super::{Validation, rule};
 
         impl<V> Validation<rule::Provided> for Option<V> {
             fn validation(&self) -> syn::Result<()> {
@@ -967,9 +957,8 @@ pub mod validate {
 
         use proc_macro2::Span;
 
+        use super::{Validation, rule};
         use crate::Required;
-
-        use super::{rule, Validation};
 
         impl<V> Validation<rule::Provided> for Required<V> {
             fn validation(&self) -> syn::Result<()> {
@@ -986,7 +975,7 @@ pub mod validate {
     mod vec {
         //! Implementations of [`Validation`] for [`Vec`].
 
-        use super::{rule, Validation};
+        use super::{Validation, rule};
 
         impl<V> Validation<rule::Provided> for Vec<V> {
             fn validation(&self) -> syn::Result<()> {
@@ -1003,7 +992,7 @@ pub mod validate {
             hash::{BuildHasher, Hash},
         };
 
-        use super::{rule, Validation};
+        use super::{Validation, rule};
 
         impl<V, S> Validation<rule::Provided> for HashSet<V, S>
         where
@@ -1021,7 +1010,7 @@ pub mod validate {
 
         use std::collections::BTreeSet;
 
-        use super::{rule, Validation};
+        use super::{Validation, rule};
 
         impl<V: Ord> Validation<rule::Provided> for BTreeSet<V> {
             fn validation(&self) -> syn::Result<()> {
@@ -1038,7 +1027,7 @@ pub mod validate {
             hash::{BuildHasher, Hash},
         };
 
-        use super::{rule, Validation};
+        use super::{Validation, rule};
 
         impl<K, V, S> Validation<rule::Provided> for HashMap<K, V, S>
         where
@@ -1056,7 +1045,7 @@ pub mod validate {
 
         use std::collections::BTreeMap;
 
-        use super::{rule, Validation};
+        use super::{Validation, rule};
 
         impl<K: Ord, V> Validation<rule::Provided> for BTreeMap<K, V> {
             fn validation(&self) -> syn::Result<()> {
