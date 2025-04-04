@@ -228,14 +228,14 @@ impl<T> Required<T> {
     /// Replaces the underlying `value` with the given one in this [`Required`]
     /// [`Container`], returning the previous one, if any.
     #[must_use]
-    pub(crate) fn replace_with(&mut self, value: T) -> Option<T> {
+    pub(crate) const fn replace_with(&mut self, value: T) -> Option<T> {
         self.0.replace(value)
     }
 
     /// Removes the underlying value from this [`Required`] [`Container`],
     /// returning it, if any.
     #[must_use]
-    pub(crate) fn take(&mut self) -> Option<T> {
+    pub(crate) const fn take(&mut self) -> Option<T> {
         self.0.take()
     }
 

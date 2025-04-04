@@ -63,14 +63,12 @@ pub trait Attrs: Default + Parse {
         for<'a> &'a T: IntoSpan,
     {
         let attrs = item.attrs();
-        filter_by_name(name, attrs)
+        let mut parsed = filter_by_name(name, attrs)
             .map(syn::Attribute::parse_args)
-            .try_fold(Self::default(), |prev, curr| prev.try_merge(curr?))
-            .and_then(|mut parsed| {
-                parsed.fallback(attrs)?;
-                parsed.validate(name, item.into_span())?;
-                Ok(parsed)
-            })
+            .try_fold(Self::default(), |prev, curr| prev.try_merge(curr?))?;
+        parsed.fallback(attrs)?;
+        parsed.validate(name, item.into_span())?;
+        Ok(parsed)
     }
 }
 
@@ -96,13 +94,12 @@ impl<V: Attrs + Default + Parse> Attrs for Box<V> {
     }
 }
 
-/// Filters the given `attrs` to contain [`syn::Attribute`]s only with the given
-/// `name`.
-#[expect(single_use_lifetimes, reason = "no other way")]
-pub fn filter_by_name<'n: 'ret, 'a: 'ret, 'ret>(
-    name: &'n str,
+/// Filters the provided `attrs` to contain [`syn::Attribute`]s only with the
+/// provided `name`.
+pub fn filter_by_name<'a>(
+    name: &str,
     attrs: &'a [syn::Attribute],
-) -> impl Iterator<Item = &'a syn::Attribute> + 'ret {
+) -> impl Iterator<Item = &'a syn::Attribute> {
     attrs.iter().filter(move |attr| path_eq_single(attr.meta.path(), name))
 }
 
