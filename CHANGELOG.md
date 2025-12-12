@@ -6,7 +6,7 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
-## [0.4.0] · 202?-??-??
+## [0.4.0] · 2025-12-12
 [0.4.0]: /../../tree/v0.4.0
 
 [Diff](/../../compare/v0.3.1...v0.4.0)
@@ -118,7 +118,7 @@ All user visible changes to this project will be documented in this file. This p
 ## [0.1.0] · 2021-06-25
 [0.1.0]: /../../tree/v0.1.0
 
-### Initially implemented 
+### Initially implemented
 
 - `ParseAttrs` trait and derive macro for parsing `syn::Attribute`s in declarative way.
 - Primitive `ToTokens` derive macro supporting only `#[to_tokens(append(<method>))]` attribute.

@@ -1,6 +1,6 @@
 [package]
 name = "synthez-codegen"
-version = "0.3.1"
+version = "0.4.0"
 edition = "2024"
 rust-version = "1.85"
 description = "Internal codegen shim of `synthez` crate."
@@ -18,7 +18,7 @@ proc-macro = true
 
 [dependencies]
 syn = { version = "2.0", features = ["parsing", "proc-macro"], default-features = false }
-synthez-core = { version = "0.3.1", path = "../core" }
+synthez-core = { version = "=0.4.0", path = "../core" }
 
 [dev-dependencies]
 proc-macro2 = { version = "1.0.4", default-features = false }
