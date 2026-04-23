@@ -7,8 +7,8 @@ synthez
 [![CI](https://github.com/arcane-rs/synthez/actions/workflows/ci.yml/badge.svg?branch=main "CI")](https://github.com/arcane-rs/synthez/actions?query=workflow%3ACI+branch%3Amain)
 [![Rust docs](https://docs.rs/synthez/badge.svg "Rust docs")](https://docs.rs/synthez)
 
-[API Docs](https://docs.rs/synthez) |
-[Changelog](https://github.com/arcane-rs/synthez/blob/main/CHANGELOG.md)
+[API Docs](https://docs.rs/synthez/0.4.0) |
+[Changelog](https://github.com/arcane-rs/synthez/blob/v0.4.0/CHANGELOG.md)
 
 Steroids for [`syn`], [`quote`] and [`proc_macro2`] crates.
 
@@ -187,7 +187,7 @@ assert_eq!(derive(input).unwrap().to_string(), output.to_string());
 
 ## License
 
-This software is subject to the terms of the [Blue Oak Model License 1.0.0](https://github.com/instrumentisto/tracerr-rs/blob/main/LICENSE.md). If a copy of the [BlueOak-1.0.0](https://spdx.org/licenses/BlueOak-1.0.0.html) license was not distributed with this file, You can obtain one at <https://blueoakcouncil.org/license/1.0.0>.
+This software is subject to the terms of the [Blue Oak Model License 1.0.0](https://github.com/instrumentisto/tracerr-rs/blob/v0.4.0/LICENSE.md). If a copy of the [BlueOak-1.0.0](https://spdx.org/licenses/BlueOak-1.0.0.html) license was not distributed with this file, You can obtain one at <https://blueoakcouncil.org/license/1.0.0>.
 
 
 
