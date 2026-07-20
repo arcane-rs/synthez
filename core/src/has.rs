@@ -25,11 +25,11 @@ macro_rules! impl_attrs_for {
 }
 
 impl_attrs_for! {
-    syn::BareFnArg,
     syn::ConstParam,
     syn::DeriveInput,
     syn::Field,
     syn::LifetimeParam,
+    syn::NamedArg,
     syn::TypeParam,
     syn::Variant,
 }

@@ -6,6 +6,17 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## main
+
+[Diff](/../../compare/v0.4.0...main)
+
+### Changed
+
+- Upgraded [`syn`] crate from 2.0 to 3.0 version. ([todo])
+
+
+
+
 ## [0.4.0] · 2025-12-12
 [0.4.0]: /../../tree/v0.4.0
 
