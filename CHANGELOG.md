@@ -6,6 +6,20 @@ All user visible changes to this project will be documented in this file. This p
 
 
 
+## [0.5.1] · 2026-07-22
+[0.5.0]: https://github.com/arcane-rs/synthez/tree/v0.5.1
+
+[Diff](https://github.com/arcane-rs/synthez/compare/v0.5.0...v0.5.1)
+
+### Changed
+
+- Upgraded [`sealed`] to 0.7 version to fully get rid of [`syn`] 2.0. ([#11])
+
+[#11]: https://github.com/arcane-rs/synthez/pull/11
+
+
+
+
 ## [0.5.0] · 2026-07-20
 [0.5.0]: https://github.com/arcane-rs/synthez/tree/v0.5.0
 
